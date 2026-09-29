@@ -1,0 +1,110 @@
+# FluidNC config TEMPLATE for a rotating-platter string art machine (Bart Dring layout).
+# Copy to config.yaml on the ESP32's filesystem and fix the pins for your board.
+#
+# Axes:
+#   X = platter rotation, in NAIL UNITS.  steps_per_mm is really steps per nail.
+#       steps_per_nail = motor_steps_per_rev * microsteps * gear_ratio / nails
+#       e.g. 200 * 16 * 6 / 288 = 66.667      (NEMA17, 1/16, 6:1 printed gear, 288 nails)
+#       e.g. 200 * 16 * 6 / 256 = 75.0        (same machine, 256 nails)
+#       e.g. 200 * 16 * 4 / 200 = 64.0        (4:1 belt, 200 nails)
+#       This is the ONLY value that changes when you change the nail count.
+#       Soft limits are off on X so post.py can emit unwrapped coordinates.
+#   Y = radial thread arm, in mm.  Homed retracted (Y=0); post.py extends to --y-out (28 mm).
+#   Z = drill axis for making the nail holes, in mm.  Optional; delete if you drill by hand.
+#
+# Pin numbers below are the ones the FluidNC "6-pack" / common ESP32 CNC boards use as
+# examples.  Check your board's pinout and the FluidNC wiki: http://wiki.fluidnc.com/
+
+board: string-art-platter
+name: StringArt
+meta: rotating platter (X, nail units) + radial arm (Y) + drill (Z)
+
+stepping:
+  engine: RMT
+  idle_ms: 255          # keep the platter energised between moves so it does not drift
+  pulse_us: 4
+  dir_delay_us: 1
+  disable_delay_us: 0
+
+axes:
+  shared_stepper_disable_pin: gpio.13:low
+
+  x:
+    steps_per_mm: 66.667        # steps PER NAIL, see formula above
+    max_rate_mm_per_min: 3000   # nails per minute; start low, raise once it runs clean
+    acceleration_mm_per_sec2: 50
+    max_travel_mm: 100000       # effectively unlimited: X unwraps as the platter turns
+    soft_limits: false
+    homing:
+      cycle: 2
+      positive_direction: false
+      mpos_mm: 0
+      feed_mm_per_min: 100
+      seek_mm_per_min: 400
+      settle_ms: 250
+      seek_scaler: 1.1
+      feed_scaler: 1.1
+    motor0:
+      limit_neg_pin: gpio.36     # index switch (limit or Hall sensor) that fires at nail 0
+      hard_limits: false
+      pulloff_mm: 1.0
+      stepstick:
+        step_pin: gpio.12
+        direction_pin: gpio.14
+
+  y:
+    steps_per_mm: 80            # GT2 belt + 20T pulley at 1/16, or set for your rack/lead screw
+    max_rate_mm_per_min: 4000
+    acceleration_mm_per_sec2: 300
+    max_travel_mm: 40
+    soft_limits: true
+    homing:
+      cycle: 1
+      positive_direction: false
+      mpos_mm: 0
+      feed_mm_per_min: 200
+      seek_mm_per_min: 1000
+      settle_ms: 250
+      seek_scaler: 1.1
+      feed_scaler: 1.1
+    motor0:
+      limit_neg_pin: gpio.39
+      hard_limits: false
+      pulloff_mm: 1.0
+      stepstick:
+        step_pin: gpio.27
+        direction_pin: gpio.26
+
+  z:
+    steps_per_mm: 400           # 8 mm lead screw at 1/16
+    max_rate_mm_per_min: 1500
+    acceleration_mm_per_sec2: 100
+    max_travel_mm: 30
+    soft_limits: true
+    homing:
+      cycle: 1
+      positive_direction: true
+      mpos_mm: 0
+      feed_mm_per_min: 200
+      seek_mm_per_min: 800
+      settle_ms: 250
+      seek_scaler: 1.1
+      feed_scaler: 1.1
+    motor0:
+      limit_pos_pin: gpio.34
+      hard_limits: false
+      pulloff_mm: 1.0
+      stepstick:
+        step_pin: gpio.33
+        direction_pin: gpio.32
+
+# Drill on/off through a relay for M3/M5 (only needed for the drilling program)
+relay:
+  output_pin: gpio.2
+  spinup_ms: 2000
+  spindown_ms: 1000
+  tool_num: 0
+  speed_map: 0=0.000% 1000=100.000%
+
+start:
+  must_home: true
