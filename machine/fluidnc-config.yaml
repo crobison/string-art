@@ -29,10 +29,26 @@ stepping:
 axes:
   shared_stepper_disable_pin: gpio.13:low
 
+  # ---- Platter: StepperOnline 23HS45-4204S (NEMA23, 4.2 A/phase, ~3 N.m, 1.8 deg, 4 wires)
+  #      on a DM542T external driver, wired to the PiBot V4.96 Pro X external-driver header.
+  #
+  #  DM542T DIP switches (verify against the table printed on the driver's side label):
+  #    SW1 OFF  SW2 ON   SW3 OFF   -> 3.31 A peak / 2.36 A RMS. Plenty of torque for a platter,
+  #                                   runs cooler than the 4.20 A max (OFF OFF OFF).
+  #    SW4 OFF                     -> half current at standstill (less heat; holding is still ~1.5 N.m)
+  #    SW5 OFF  SW6 OFF  SW7 ON  SW8 ON  -> 3200 pulses/rev (16 microsteps)
+  #  Motor leads: A+ black, A- green, B+ red, B- blue.  Power: VDC+ 24 V, GND.
+  #  Signals (common-anode): PUL+ DIR+ ENA+ to the header's +5 V; PUL- to STEP, DIR- to DIR.
+  #  Leave ENA- unconnected (motor enabled by default) or wire it and invert the enable in YAML.
+  #
+  #  steps_per_nail = 3200 * gear_ratio / nails
+  #    4:1 GT2 belt, 288 nails -> 44.444   (recommended: 0.028 deg/step, no gear backlash)
+  #    direct drive,  288 nails -> 11.111   (viable with this motor's torque; ~0.11 deg/step)
+  #    4:1 belt,      256 nails -> 50.0
   x:
-    steps_per_mm: 66.667        # steps PER NAIL, see formula above
-    max_rate_mm_per_min: 3000   # nails per minute; start low, raise once it runs clean
-    acceleration_mm_per_sec2: 50
+    steps_per_mm: 44.444        # steps PER NAIL: 3200 * 4 / 288
+    max_rate_mm_per_min: 2000   # nails per minute; start low, raise once it runs clean
+    acceleration_mm_per_sec2: 30
     max_travel_mm: 100000       # effectively unlimited: X unwraps as the platter turns
     soft_limits: false
     homing:
@@ -48,12 +64,20 @@ axes:
       limit_neg_pin: gpio.36     # index switch (limit or Hall sensor) that fires at nail 0
       hard_limits: false
       pulloff_mm: 1.0
-      stepstick:
-        step_pin: gpio.12
+      standard_stepper:          # external step/dir driver (DM542T), not a StepStick socket
+        step_pin: gpio.12        # replace with the PiBot X external-header pins from their wiki
         direction_pin: gpio.14
+        # disable_pin: gpio.13:low   # only if ENA- is wired
 
+  # ---- Arm and drill: StepperOnline 17HE08-1004S (NEMA17 pancake, 20 mm, 1.0 A/phase, ~17 N.cm)
+  #      on TMC2209 StepSticks in the PiBot Y and Z sockets, standalone (step/dir) mode.
+  #    Vref 0.9-1.0 V  -> ~0.65-0.7 A RMS, ~1.0 A peak = the motor's rating. Do not exceed 1.4 V.
+  #    MS1/MS2 jumpers for 16 microsteps -> 3200 steps/rev (TMC2209 interpolates to 256 internally).
+  #    Leads: black A+, green A-, red B+, blue B-.
+  #    Arm on GT2 20T pulley: 17 N.cm / 6.4 mm radius = ~26 N of belt pull. Thread tension is ~1-2 N.
+  #    Drill on T8 8 mm lead screw: ~60 N of thrust. Enough for a light 12 V mini drill in MDF.
   y:
-    steps_per_mm: 80            # GT2 belt + 20T pulley at 1/16, or set for your rack/lead screw
+    steps_per_mm: 80            # GT2 belt + 20T pulley (40 mm/rev) at 16 microsteps: 3200 / 40
     max_rate_mm_per_min: 4000
     acceleration_mm_per_sec2: 300
     max_travel_mm: 40
@@ -76,7 +100,7 @@ axes:
         direction_pin: gpio.26
 
   z:
-    steps_per_mm: 400           # 8 mm lead screw at 1/16
+    steps_per_mm: 400           # T8 lead screw, 8 mm lead, at 16 microsteps: 3200 / 8
     max_rate_mm_per_min: 1500
     acceleration_mm_per_sec2: 100
     max_travel_mm: 30
