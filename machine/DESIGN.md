@@ -38,11 +38,13 @@ that one number. Nothing else.
 | Turntable bearing | 300 mm+ lazy-susan bearing, or 3–4 ball casters under the rim | takes the board's weight off the motor |
 | Platter drive | **On hand:** NEMA23 23HS45-4204S (4.2 A, ~3 N·m) on a DM542T, GT2 belt 4:1 to a printed ring on the platter | 3 N·m is far more than a 60 cm MDF disc needs; 4:1 at 16 microsteps gives 0.028°/step, 44.4 steps per nail at 288 nails. Direct drive is viable too. |
 | Arm drive | **On hand:** NEMA17 on a short GT2 belt or T8 lead screw (a real Y axis, homes like one) | 30–40 mm stroke |
-| Drill (optional) | **On hand:** second NEMA17 on a T8 lead-screw Z; 12 V mini drill switched by a relay | machine drills its own evenly spaced holes |
+| Drill (optional) | **On hand:** second NEMA17 on a T8 lead-screw Z. **Pick:** 555-motor mini drill kit with JT0 0.3–4 mm chuck and bracket, 12–36 V, ~$16 (Amazon B0HJ72X4B5; equivalents B0HJMZMMBP, B0H4BH3R33). Runs straight from 24 V, no buck needed | light enough for the pancake NEMA17 Z; JT0 chuck grips 1.2–1.5 mm nail bits. Heavier alternative: 775 motor with B10 chuck, B088LVLLRS, $30 |
+| Drill relay | **Pick:** HiLetgo 5 V 1-channel opto-isolated relay module, 2-pack, $7.39 (Amazon B00LW15A4W) | set to low-level trigger for 3.3 V logic; coil from the 5 V LM2596, input from the PiBot spindle-enable/relay signal, drill's 24 V through the contacts. 10-pack alternative B07WQH63FB |
 | Controller | **Chosen:** PiBot V4.96 Pro (classic ESP32, FluidNC, 6 StepStick sockets + 5 V external-driver headers, 12–24 V). Amazon B0HKNMK5CH, ~$99 with OLED and antenna | free motion planning, homing, WiFi G-code upload; DM542T on the X external header, TMC2209s in the Y and Z sockets |
 | Drivers | DM542T (on hand) for the platter; 2× TMC2209 StepStick for arm and drill | DM542T DIP settings are in fluidnc-config.yaml |
 | PSU | 24 V 6 A (≈150 W), e.g. Mean Well LRS-150-24 | DM542T can pull 4 A peak; NEMA17s ~1.5 A each |
-| Homing | microswitch or Hall sensor + magnet at nail 0; microswitch on the arm | nail 0 must be repeatable to a fraction of a pitch |
+| Low-voltage rails | **On hand:** LM2596 buck modules. One set to 5 V for the relay coil, lights, or a servo. The 555 drill is 24 V rated, so no 12 V rail is needed | Realistically 2 A each without a heatsink. Set the trimpot with a meter before connecting a load; no reverse-polarity protection |
+| Homing | **Pick:** 6-pack mechanical endstops with 1 m cables, $10.99 (Amazon B07PCN6T6F); one per axis plus spares. Optional Hall sensor + magnet for the platter index | nail 0 must be repeatable to a fraction of a pitch; PiBot inputs take dry contacts, wire signal + ground only |
 | PSU | 24 V, 5 A | headroom for the platter motor |
 | Nails | 1.2–1.5 mm × 20 mm brads, or 2.54 mm pin-header strips in a routed groove | evenness matters more than nail type |
 | Thread | black polyester sewing thread, Tex 30 / #30 / 402 (≈0.15–0.2 mm). Gütermann Sew-All works | 1 portrait ≈ 1–2 km; a 4000 m cone ≈ 2–3 portraits at 288 nails |
