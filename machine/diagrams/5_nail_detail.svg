@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="430" viewBox="0 0 1000 430" font-family="Helvetica, Arial, sans-serif" font-size="11">
+<defs><marker id="a" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#c33"/></marker><marker id="b" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#357"/></marker><pattern id="wood" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" stroke="#b58a4a" stroke-width="1"/></pattern><pattern id="steel" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)"><line x1="0" y1="0" x2="0" y2="5" stroke="#667" stroke-width="0.8"/></pattern><pattern id="print" width="4" height="4" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="0.7" fill="#3a7"/></pattern></defs>
+<rect width="1000" height="430" fill="#fff"/>
+<text x="12" y="22" font-size="15" font-weight="bold">5. Nail detail: outward lean makes every new wrap slide down onto the stack (thread size exaggerated)</text>
+<rect x="80.0" y="300.0" width="420.0" height="72.0" fill="url(#wood)" stroke="#222" stroke-width="1" />
+<text x="86.0" y="360.0" font-size="10" text-anchor="start" fill="#222" font-weight="normal">platter, 12 mm Baltic birch</text>
+<polygon points="255.2,300.0 264.8,300.0 249.8,372.0 240.2,372.0" fill="#fff" stroke="#555" stroke-width="1"/>
+<polygon points="240.5,372.0 249.5,372.0 287.0,192.0 278.0,192.0" fill="#666" stroke="#222" stroke-width="1"/>
+<circle cx="267.8" cy="297.0" r="2.4" fill="#c33" stroke="none" stroke-width="1"/>
+<circle cx="268.6" cy="293.4" r="2.4" fill="#c33" stroke="none" stroke-width="1"/>
+<circle cx="269.4" cy="289.8" r="2.4" fill="#c33" stroke="none" stroke-width="1"/>
+<circle cx="270.1" cy="286.2" r="2.4" fill="#c33" stroke="none" stroke-width="1"/>
+<circle cx="270.9" cy="282.6" r="2.4" fill="#c33" stroke="none" stroke-width="1"/>
+<circle cx="271.7" cy="279.0" r="2.4" fill="#c33" stroke="none" stroke-width="1"/>
+<circle cx="272.4" cy="275.4" r="2.4" fill="#c33" stroke="none" stroke-width="1"/>
+<circle cx="273.2" cy="271.8" r="2.4" fill="#c33" stroke="none" stroke-width="1"/>
+<text x="308.0" y="228.0" font-size="10" text-anchor="start" fill="#c33" font-weight="normal">wraps (Ø0.15–0.2 thread) stack up the OUTER face,</text>
+<text x="308.0" y="238.8" font-size="10" text-anchor="start" fill="#c33" font-weight="normal">≤3 mm for ~14 wraps per nail</text>
+<line x1="284.0" y1="279.0" x2="212.0" y2="279.0" stroke="#357" stroke-width="2" marker-end="url(#b)"/>
+<text x="80.0" y="267.0" font-size="10" text-anchor="start" fill="#357" font-weight="normal">chord tension T pulls inward</text>
+<line x1="284.0" y1="279.0" x2="280.3" y2="296.6" stroke="#3a7" stroke-width="2" marker-end="url(#b)"/>
+<text x="320.0" y="295.2" font-size="10" text-anchor="start" fill="#3a7" font-weight="normal">T·sin(12°) pushes the wrap DOWN the nail</text>
+<line x1="260.0" y1="300.0" x2="260.0" y2="174.0" stroke="#999" stroke-width="1" stroke-dasharray="2,2"/>
+<text x="266.0" y="180.0" font-size="10" text-anchor="start" fill="#222" font-weight="normal">12° lean: tops move 3.7 mm outward</text>
+<line x1="188.0" y1="300.0" x2="188.0" y2="192.0" stroke="#c33" stroke-width="1" marker-start="url(#a)" marker-end="url(#a)"/>
+<text x="183.0" y="250.0" font-size="10" text-anchor="end" fill="#c33" font-weight="normal">18 proud</text>
+<line x1="140.0" y1="300.0" x2="140.0" y2="372.0" stroke="#c33" stroke-width="1" marker-start="url(#a)" marker-end="url(#a)"/>
+<text x="135.0" y="340.0" font-size="10" text-anchor="end" fill="#c33" font-weight="normal">12 deep, Ø1.3 hole</text>
+<line x1="293.0" y1="300.0" x2="293.0" y2="282.0" stroke="#c33" stroke-width="1" marker-start="url(#a)" marker-end="url(#a)"/>
+<text x="298.0" y="295.0" font-size="10" text-anchor="start" fill="#c33" font-weight="normal">≤3</text>
+<text x="12.0" y="398.0" font-size="10" text-anchor="start" fill="#444" font-weight="normal">Effective wrap radius drifts outward by 3 × tan(12°) = 0.64 mm over a full stack, the same on every nail: a uniform radius change, not an error.</text>
+<text x="12.0" y="414.0" font-size="10" text-anchor="start" fill="#444" font-weight="normal">Use smooth-shank pins (no rings or ridges). A small head is fine and acts as a safety stop; the tip clears it by 8 mm.</text>
+</svg>

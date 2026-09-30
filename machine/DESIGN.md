@@ -13,8 +13,10 @@ the video https://www.youtube.com/watch?v=M1gXuKFspgY
   This is the X axis, and it is configured in **nail units**: X=37 means nail 37 is under the arm.
 - A radial arm carries the thread guide (a small tube or hook) and moves in and out across the nail
   ring. Extended (Y_OUT) the guide is outside the ring; retracted (Y_IN) it is inside.
-- To wrap a nail the machine approaches at `pin + 0.5` with the arm out, retracts, rotates to
-  `pin - 0.5`, and extends again. The thread has now looped around the nail from the outside.
+- To wrap a nail the platter brings it to `pin + 0.5` with the tip resting inside the ring, the
+  tip moves outside the ring, the platter turns back to `pin - 0.5` (sweeping the tip past the
+  nail on the outside), and the tip comes back inside. The thread has now looped the nail from the
+  outside. Full mechanics, dimensions and figures are in `PLATTER.md`.
 - Nails are driven into holes drilled at **10° or more outward lean** so the thread slides down the
   nail on its own. No Z motion is needed while threading.
 - The thread runs from a spool through a friction tensioner and an elevated redirect hook above

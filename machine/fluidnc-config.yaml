@@ -80,11 +80,11 @@ axes:
     steps_per_mm: 80            # GT2 belt + 20T pulley (40 mm/rev) at 16 microsteps: 3200 / 40
     max_rate_mm_per_min: 4000
     acceleration_mm_per_sec2: 300
-    max_travel_mm: 40
+    max_travel_mm: 42            # Y=0 tip outside the ring past the platter edge, Y=35 tip inside over the board
     soft_limits: true
     homing:
       cycle: 1
-      positive_direction: false
+      positive_direction: false  # home toward the OUTSIDE end, away from the nails
       mpos_mm: 0
       feed_mm_per_min: 200
       seek_mm_per_min: 1000
