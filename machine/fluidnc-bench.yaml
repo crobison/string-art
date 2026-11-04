@@ -1,0 +1,118 @@
+# BENCH TEST config for the PiBot V4.96 Pro: same pins as fluidnc-config.yaml, but no homing,
+# no soft limits and no must_home, so you can jog a motor before any switch is wired.
+# Upload as bench.yaml, run  $Config/Filename=bench.yaml  and restart. Switch to stringart.yaml after.
+#   $J=G91 X72 F600   -> exactly one NEMA23 shaft turn (72 x 44.444 = 3200 steps)
+#   $J=G91 Y40 F600   -> exactly one pancake shaft turn on Y (40 x 80 = 3200 steps)
+#   $J=G91 Z8 F300    -> exactly one pancake shaft turn on Z (8 x 400 = 3200 steps)
+# One turn per command proves the microstep setting as well as the wiring.
+
+board: PiBot V4.96 Pro
+name: StringArtBench
+meta: rotating platter (X, nail units) + radial threader (Y) + drill feed (Z)
+
+stepping:
+  engine: I2S_STREAM
+  idle_ms: 255          # 255 = never disable: keeps the platter energised between moves
+  pulse_us: 4           # DM542T needs >= 2.5 us
+  dir_delay_us: 5       # DM542T wants DIR settled 5 us before the step edge
+  disable_delay_us: 0
+
+axes:
+  shared_stepper_disable_pin: NO_PIN
+
+  # ---- Platter: 23HS45-4204S NEMA23 on a DM542T, wired to slot 1's green terminal (EN STP DIR GND).
+  #  DM542T DIP (StepperOnline table, 1.8 deg motor):
+  #    SW1 OFF  SW2 ON  SW3 OFF -> 3.31 A peak / 2.36 A RMS
+  #    SW4 OFF                  -> half current at standstill
+  #    SW5 ON   SW6 ON  SW7 OFF  SW8 ON -> 3200 pulses/rev
+  #  Signals (common cathode, the PiBot terminal sources 5 V):
+  #    STP -> PUL+, DIR -> DIR+, GND -> PUL- and DIR-.  ENA+/ENA- unconnected (always enabled).
+  x:
+    steps_per_mm: 44.444        # steps PER NAIL: 3200 * 4 / 288
+    max_rate_mm_per_min: 2000   # nails per minute; raise once it runs clean
+    acceleration_mm_per_sec2: 30
+    max_travel_mm: 100000       # effectively unlimited: X unwraps as the platter turns
+    soft_limits: false
+    motor0:
+      limit_neg_pin: NO_PIN
+      hard_limits: false
+      pulloff_mm: 1.0
+      standard_stepper:
+        step_pin: I2SO.2
+        direction_pin: I2SO.1    # wrong way round? use I2SO.1:low
+        disable_pin: I2SO.0      # not wired to the DM542T; drives the slot's EN LED only
+
+  # ---- Threader: 17HE08-1004S pancake on a TMC2209 in socket 2, standalone step/dir.
+  #  Vref 0.9-1.0 V (~0.65-0.7 A RMS). MS1+MS2 caps fitted = 1/16.  No ms3_pin: on the TMC2209
+  #  that socket position is PDN_UART, and leaving it low keeps normal operation.
+  y:
+    steps_per_mm: 80            # GT2 20T pulley (40 mm/rev) at 16 microsteps: 3200 / 40
+    max_rate_mm_per_min: 4000
+    acceleration_mm_per_sec2: 300
+    max_travel_mm: 1000
+    soft_limits: false
+    motor0:
+      limit_neg_pin: NO_PIN
+      hard_limits: false
+      pulloff_mm: 1.0
+      stepstick:
+        step_pin: I2SO.5
+        direction_pin: I2SO.4
+        disable_pin: I2SO.7
+
+  # ---- Drill feed: 17HE08-1004S on a TMC2209 in socket 3, T8 lead screw. Homes UP.
+  z:
+    steps_per_mm: 400           # 8 mm lead at 16 microsteps: 3200 / 8
+    max_rate_mm_per_min: 1500
+    acceleration_mm_per_sec2: 100
+    max_travel_mm: 1000
+    soft_limits: false
+    motor0:
+      limit_neg_pin: NO_PIN
+      hard_limits: false
+      pulloff_mm: 1.0
+      stepstick:
+        step_pin: I2SO.10
+        direction_pin: I2SO.9
+        disable_pin: I2SO.8
+
+i2so:
+  bck_pin: gpio.22
+  data_pin: gpio.21
+  ws_pin: gpio.17
+
+spi:
+  miso_pin: gpio.19
+  mosi_pin: gpio.23
+  sck_pin: gpio.18
+
+sdcard:
+  card_detect_pin: NO_PIN
+  cs_pin: gpio.5
+
+i2c0:
+  sda_pin: gpio.27
+  scl_pin: gpio.25
+
+oled:
+  i2c_num: 0
+  i2c_address: 60
+  width: 128
+  height: 64
+  radio_delay_ms: 1000
+
+# Drill on/off through the PiBot's on-board relay (M3 on, M5 off). Contacts switch the drill's 24 V.
+relay:
+  direction_pin: NO_PIN
+  output_pin: gpio.26
+  enable_pin: NO_PIN
+  disable_with_s0: false
+  s0_with_disable: true
+  spinup_ms: 2000
+  spindown_ms: 1000
+  tool_num: 0
+  speed_map: 0=0.000% 0=100.000% 1=100.000%
+  off_on_alarm: true
+
+start:
+  must_home: false

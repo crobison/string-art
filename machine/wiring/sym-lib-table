@@ -1,0 +1,4 @@
+(sym_lib_table
+  (version 7)
+  (lib (name "StringArt")(type "KiCad")(uri "${KIPRJMOD}/StringArt.kicad_sym")(options "")(descr "String art machine modules"))
+)

@@ -1,53 +1,53 @@
-# FluidNC config TEMPLATE for a rotating-platter string art machine (Bart Dring layout).
-# Copy to config.yaml on the ESP32's filesystem and fix the pins for your board.
+# FluidNC config for the rotating-platter string art machine on a PiBot V4.96 Pro.
+# Upload to the board's flash as stringart.yaml, then  $Config/Filename=stringart.yaml  and restart.
+# For the first motor test use fluidnc-bench.yaml instead (no homing, no soft limits).
+#
+# Pins follow the PiBot V4.96 Pro factory test YAML and wiki (checked 2026-11-04):
+#   https://wiki.pibot.com/doku.php?id=pibot_cnc_laser_series:v496_pro:docs:xyzabc-drv8825-config
+#   Steppers come out of an I2S shift register (I2SO.n), not plain gpios.
+#   Slot 1 (X)  STEP I2SO.2  DIR I2SO.1  EN I2SO.0   limit gpio.33
+#   Slot 2 (Y)  STEP I2SO.5  DIR I2SO.4  EN I2SO.7   limit gpio.32
+#   Slot 3 (Z)  STEP I2SO.10 DIR I2SO.9  EN I2SO.8   limit gpio.35
+#   On-board relay gpio.26 (GPIO26 function jumper on "Relay Output").  gpio.2 is the probe INPUT.
+#
+# Board jumpers for this config (see the wiring guide, "Board setup"):
+#   VDD = 5V, SW-VCC = 5V, GPIO26 = Relay Output, USB-5V jumper removed, SPI jumpers removed,
+#   slot 1 routing jumpers IN with its StepStick socket EMPTY, slots 2-3 routing jumpers OUT,
+#   MS1 and MS2 caps fitted (1/16 for the TMC2209s), RST/SLP caps off.
 #
 # Axes:
 #   X = platter rotation, in NAIL UNITS.  steps_per_mm is really steps per nail.
-#       steps_per_nail = motor_steps_per_rev * microsteps * gear_ratio / nails
-#       e.g. 200 * 16 * 6 / 288 = 66.667      (NEMA17, 1/16, 6:1 printed gear, 288 nails)
-#       e.g. 200 * 16 * 6 / 256 = 75.0        (same machine, 256 nails)
-#       e.g. 200 * 16 * 4 / 200 = 64.0        (4:1 belt, 200 nails)
+#       steps_per_nail = 3200 * gear_ratio / nails      (DM542T at 3200 pulses/rev)
+#         4:1 belt, 288 nails -> 44.444    4:1 belt, 256 nails -> 50.0    direct, 288 -> 11.111
 #       This is the ONLY value that changes when you change the nail count.
 #       Soft limits are off on X so post.py can emit unwrapped coordinates.
-#   Y = radial thread arm, in mm.  Homed retracted (Y=0); post.py extends to --y-out (28 mm).
-#   Z = drill axis for making the nail holes, in mm.  Optional; delete if you drill by hand.
-#
-# Pin numbers below are the ones the FluidNC "6-pack" / common ESP32 CNC boards use as
-# examples.  Check your board's pinout and the FluidNC wiki: http://wiki.fluidnc.com/
+#   Y = radial threader slide, mm. Y=0 homed with the tip OUTSIDE the ring, Y=35 tip inside.
+#   Z = drill feed, mm. Only used by the drilling program.
 
-board: string-art-platter
+board: PiBot V4.96 Pro
 name: StringArt
-meta: rotating platter (X, nail units) + radial arm (Y) + drill (Z)
+meta: rotating platter (X, nail units) + radial threader (Y) + drill feed (Z)
 
 stepping:
-  engine: RMT
-  idle_ms: 255          # keep the platter energised between moves so it does not drift
-  pulse_us: 4
-  dir_delay_us: 1
+  engine: I2S_STREAM
+  idle_ms: 255          # 255 = never disable: keeps the platter energised between moves
+  pulse_us: 4           # DM542T needs >= 2.5 us
+  dir_delay_us: 5       # DM542T wants DIR settled 5 us before the step edge
   disable_delay_us: 0
 
 axes:
-  shared_stepper_disable_pin: gpio.13:low
+  shared_stepper_disable_pin: NO_PIN
 
-  # ---- Platter: StepperOnline 23HS45-4204S (NEMA23, 4.2 A/phase, ~3 N.m, 1.8 deg, 4 wires)
-  #      on a DM542T external driver, wired to the PiBot V4.96 Pro X external-driver header.
-  #
-  #  DM542T DIP switches (verify against the table printed on the driver's side label):
-  #    SW1 OFF  SW2 ON   SW3 OFF   -> 3.31 A peak / 2.36 A RMS. Plenty of torque for a platter,
-  #                                   runs cooler than the 4.20 A max (OFF OFF OFF).
-  #    SW4 OFF                     -> half current at standstill (less heat; holding is still ~1.5 N.m)
-  #    SW5 OFF  SW6 OFF  SW7 ON  SW8 ON  -> 3200 pulses/rev (16 microsteps)
-  #  Motor leads: A+ black, A- green, B+ red, B- blue.  Power: VDC+ 24 V, GND.
-  #  Signals (common-anode): PUL+ DIR+ ENA+ to the header's +5 V; PUL- to STEP, DIR- to DIR.
-  #  Leave ENA- unconnected (motor enabled by default) or wire it and invert the enable in YAML.
-  #
-  #  steps_per_nail = 3200 * gear_ratio / nails
-  #    4:1 GT2 belt, 288 nails -> 44.444   (recommended: 0.028 deg/step, no gear backlash)
-  #    direct drive,  288 nails -> 11.111   (viable with this motor's torque; ~0.11 deg/step)
-  #    4:1 belt,      256 nails -> 50.0
+  # ---- Platter: 23HS45-4204S NEMA23 on a DM542T, wired to slot 1's green terminal (EN STP DIR GND).
+  #  DM542T DIP (StepperOnline table, 1.8 deg motor):
+  #    SW1 OFF  SW2 ON  SW3 OFF -> 3.31 A peak / 2.36 A RMS
+  #    SW4 OFF                  -> half current at standstill
+  #    SW5 ON   SW6 ON  SW7 OFF  SW8 ON -> 3200 pulses/rev
+  #  Signals (common cathode, the PiBot terminal sources 5 V):
+  #    STP -> PUL+, DIR -> DIR+, GND -> PUL- and DIR-.  ENA+/ENA- unconnected (always enabled).
   x:
     steps_per_mm: 44.444        # steps PER NAIL: 3200 * 4 / 288
-    max_rate_mm_per_min: 2000   # nails per minute; start low, raise once it runs clean
+    max_rate_mm_per_min: 2000   # nails per minute; raise once it runs clean
     acceleration_mm_per_sec2: 30
     max_travel_mm: 100000       # effectively unlimited: X unwraps as the platter turns
     soft_limits: false
@@ -61,26 +61,22 @@ axes:
       seek_scaler: 1.1
       feed_scaler: 1.1
     motor0:
-      limit_neg_pin: gpio.36     # index switch (limit or Hall sensor) that fires at nail 0
+      limit_neg_pin: gpio.33     # X limit terminal: index switch at nail 0, wired NC (no :low)
       hard_limits: false
       pulloff_mm: 1.0
-      standard_stepper:          # external step/dir driver (DM542T), not a StepStick socket
-        step_pin: gpio.12        # replace with the PiBot X external-header pins from their wiki
-        direction_pin: gpio.14
-        # disable_pin: gpio.13:low   # only if ENA- is wired
+      standard_stepper:
+        step_pin: I2SO.2
+        direction_pin: I2SO.1    # wrong way round? use I2SO.1:low
+        disable_pin: I2SO.0      # not wired to the DM542T; drives the slot's EN LED only
 
-  # ---- Arm and drill: StepperOnline 17HE08-1004S (NEMA17 pancake, 20 mm, 1.0 A/phase, ~17 N.cm)
-  #      on TMC2209 StepSticks in the PiBot Y and Z sockets, standalone (step/dir) mode.
-  #    Vref 0.9-1.0 V  -> ~0.65-0.7 A RMS, ~1.0 A peak = the motor's rating. Do not exceed 1.4 V.
-  #    MS1/MS2 jumpers for 16 microsteps -> 3200 steps/rev (TMC2209 interpolates to 256 internally).
-  #    Leads: black A+, green A-, red B+, blue B-.
-  #    Arm on GT2 20T pulley: 17 N.cm / 6.4 mm radius = ~26 N of belt pull. Thread tension is ~1-2 N.
-  #    Drill on T8 8 mm lead screw: ~60 N of thrust. Enough for a light 12 V mini drill in MDF.
+  # ---- Threader: 17HE08-1004S pancake on a TMC2209 in socket 2, standalone step/dir.
+  #  Vref 0.9-1.0 V (~0.65-0.7 A RMS). MS1+MS2 caps fitted = 1/16.  No ms3_pin: on the TMC2209
+  #  that socket position is PDN_UART, and leaving it low keeps normal operation.
   y:
-    steps_per_mm: 80            # GT2 belt + 20T pulley (40 mm/rev) at 16 microsteps: 3200 / 40
+    steps_per_mm: 80            # GT2 20T pulley (40 mm/rev) at 16 microsteps: 3200 / 40
     max_rate_mm_per_min: 4000
     acceleration_mm_per_sec2: 300
-    max_travel_mm: 42            # Y=0 tip outside the ring past the platter edge, Y=35 tip inside over the board
+    max_travel_mm: 42
     soft_limits: true
     homing:
       cycle: 1
@@ -92,15 +88,17 @@ axes:
       seek_scaler: 1.1
       feed_scaler: 1.1
     motor0:
-      limit_neg_pin: gpio.39
+      limit_neg_pin: gpio.32     # Y limit terminal, wired NC
       hard_limits: false
       pulloff_mm: 1.0
       stepstick:
-        step_pin: gpio.27
-        direction_pin: gpio.26
+        step_pin: I2SO.5
+        direction_pin: I2SO.4
+        disable_pin: I2SO.7
 
+  # ---- Drill feed: 17HE08-1004S on a TMC2209 in socket 3, T8 lead screw. Homes UP.
   z:
-    steps_per_mm: 400           # T8 lead screw, 8 mm lead, at 16 microsteps: 3200 / 8
+    steps_per_mm: 400           # 8 mm lead at 16 microsteps: 3200 / 8
     max_rate_mm_per_min: 1500
     acceleration_mm_per_sec2: 100
     max_travel_mm: 30
@@ -115,20 +113,51 @@ axes:
       seek_scaler: 1.1
       feed_scaler: 1.1
     motor0:
-      limit_pos_pin: gpio.34
+      limit_pos_pin: gpio.35     # Z limit terminal, wired NC
       hard_limits: false
       pulloff_mm: 1.0
       stepstick:
-        step_pin: gpio.33
-        direction_pin: gpio.32
+        step_pin: I2SO.10
+        direction_pin: I2SO.9
+        disable_pin: I2SO.8
 
-# Drill on/off through a relay for M3/M5 (only needed for the drilling program)
+i2so:
+  bck_pin: gpio.22
+  data_pin: gpio.21
+  ws_pin: gpio.17
+
+spi:
+  miso_pin: gpio.19
+  mosi_pin: gpio.23
+  sck_pin: gpio.18
+
+sdcard:
+  card_detect_pin: NO_PIN
+  cs_pin: gpio.5
+
+i2c0:
+  sda_pin: gpio.27
+  scl_pin: gpio.25
+
+oled:
+  i2c_num: 0
+  i2c_address: 60
+  width: 128
+  height: 64
+  radio_delay_ms: 1000
+
+# Drill on/off through the PiBot's on-board relay (M3 on, M5 off). Contacts switch the drill's 24 V.
 relay:
-  output_pin: gpio.2
+  direction_pin: NO_PIN
+  output_pin: gpio.26
+  enable_pin: NO_PIN
+  disable_with_s0: false
+  s0_with_disable: true
   spinup_ms: 2000
   spindown_ms: 1000
   tool_num: 0
-  speed_map: 0=0.000% 1000=100.000%
+  speed_map: 0=0.000% 0=100.000% 1=100.000%
+  off_on_alarm: true
 
 start:
   must_home: true
