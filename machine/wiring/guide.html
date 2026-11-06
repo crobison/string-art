@@ -183,7 +183,9 @@ footer { margin-top: 72px; padding-top: 20px; border-top: 1px solid var(--line);
         <li>Use tweezers or pliers for the caps. Fit or remove each one, then check it against the table again.</li>
       </ol></div>
       <div class="call warn"><h4>Careful</h4><ol>
-        <li>Slot 1 gets routing jumpers for the DM542T, so <b>slot 1's StepStick socket must stay empty</b>. A driver in a jumpered slot destroys the driver and the board's chips.</li>
+        <li>Each of the six driver slots has a <b>StepStick socket</b>: two rows of 8 female header pins that a plug-in driver board pushes into. Your TMC2209s are StepSticks, and they go in the sockets of slots 2 and 3.</li>
+        <li>Slot 1 (X on the silkscreen) is different. The DM542T is an external driver and doesn't plug in. Fit all four of slot 1's routing jumpers (STP, DIR, EN, GND), and <b>leave slot 1's socket empty</b>.</li>
+        <li>Never put a TMC2209 in slot 1. With the routing jumpers in, its 24 V motor outputs land on the board's logic lines. That destroys the driver and the board's chips.</li>
         <li>The board ships with only three caps fitted (VDD, SW-VCC, GPIO26). Every other cap in this table is one you add.</li>
       </ol></div>
     </div>
@@ -202,7 +204,8 @@ footer { margin-top: 72px; padding-top: 20px; border-top: 1px solid var(--line);
       </tbody>
     </table></div>
     <div class="call check"><h4>Check before moving on</h4><ol>
-      <li>Count the caps: USB-5V off; VDD on 5V; SW-VCC on 5V; GPIO26 on Relay; slot 1 routing caps in; MS1 and MS2 in; nothing else.</li>
+      <li>Count the jumpers (caps): <b>9 on the board in total</b>, whatever the board shipped with. VDD on 5V (1), SW-VCC on 5V (1), GPIO26 on Relay (1), slot 1 routing STP, DIR, EN and GND (4), MS1 and MS2 (2). USB-5V has no jumper. Slots 2–6 have no routing jumpers. No jumpers on RST/SLP or SPI.</li>
+      <li>If your count isn't 9, compare each row of the table above with the board until it is. Spare jumpers go in a bag, not on unused pins.</li>
       <li>Optional meter check once the board has 24 V (section B): socket 2's MS1 and MS2 pins read about 5 V to GND. The bench test in section C proves this anyway.</li>
     </ol></div>
   </section>
