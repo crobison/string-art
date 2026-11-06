@@ -14,7 +14,7 @@ stepping:
   engine: I2S_STREAM
   idle_ms: 255          # 255 = never disable: keeps the platter energised between moves
   pulse_us: 4           # DM542T needs >= 2.5 us
-  dir_delay_us: 5       # DM542T wants DIR settled 5 us before the step edge
+  dir_delay_us: 8       # DM542T wants DIR settled >= 5 us before the step edge; margin for the I2S engine
   disable_delay_us: 0
 
 axes:
@@ -25,10 +25,12 @@ axes:
   #    SW1 OFF  SW2 ON  SW3 OFF -> 3.31 A peak / 2.36 A RMS
   #    SW4 OFF                  -> half current at standstill
   #    SW5 ON   SW6 ON  SW7 OFF  SW8 ON -> 3200 pulses/rev
+  #  Newer DM542T (V4.0) have a 5V/24V signal selector, factory 24V: set it to 5V or nothing moves.
+  #  Slot 1's terminal has no pin labels: pin 1-4 = EN, STP, DIR, GND (GND beeps to Vmot -).
   #  Signals (common cathode, the PiBot terminal sources 5 V):
   #    STP -> PUL+, DIR -> DIR+, GND -> PUL- and DIR-.  ENA+/ENA- unconnected (always enabled).
   x:
-    steps_per_mm: 44.444        # steps PER NAIL: 3200 * 4 / 288
+    steps_per_mm: 44.44444      # steps PER NAIL: 3200 * 4 / 288 (keep the digits: X never wraps)
     max_rate_mm_per_min: 2000   # nails per minute; raise once it runs clean
     acceleration_mm_per_sec2: 30
     max_travel_mm: 100000       # effectively unlimited: X unwraps as the platter turns
@@ -43,8 +45,10 @@ axes:
         disable_pin: I2SO.0      # not wired to the DM542T; drives the slot's EN LED only
 
   # ---- Threader: 17HE08-1004S pancake on a TMC2209 in socket 2, standalone step/dir.
-  #  Vref 0.9-1.0 V (~0.65-0.7 A RMS). MS1+MS2 caps fitted = 1/16.  No ms3_pin: on the TMC2209
-  #  that socket position is PDN_UART, and leaving it low keeps normal operation.
+  #  Vref 0.9-1.0 V (~0.65-0.7 A RMS), needs 24 V on Vmot-Driver to read. MS1+MS2 jumpers on the
+  #  VDD side = 1/16.  No ms3_pin: that socket position is PDN_UART (I2SO.6 / I2SO.11); low keeps
+  #  standalone mode with automatic current reduction at standstill.
+  #  Coils on the 17HE08-1004S: black/blue and green/red, each on two neighbouring terminal screws.
   y:
     steps_per_mm: 80            # GT2 20T pulley (40 mm/rev) at 16 microsteps: 3200 / 40
     max_rate_mm_per_min: 4000
@@ -60,7 +64,9 @@ axes:
         direction_pin: I2SO.4
         disable_pin: I2SO.7
 
-  # ---- Drill feed: 17HE08-1004S on a TMC2209 in socket 3, T8 lead screw. Homes UP.
+  # ---- Drill feed: 17HE08-1004S on a TMC2209 in socket 3, T8 lead screw. Homes UP to Z=0, so
+  #  machine Z runs 0 down to -max_travel; post.py --drill sets work Z0 at the board surface.
+  #  400 steps/mm assumes an 8 mm lead (T8x8). A T8x2 screw needs 1600.
   z:
     steps_per_mm: 400           # 8 mm lead at 16 microsteps: 3200 / 8
     max_rate_mm_per_min: 1500
@@ -80,6 +86,7 @@ i2so:
   bck_pin: gpio.22
   data_pin: gpio.21
   ws_pin: gpio.17
+  min_pulse_us: 4       # 4 us I2S frames: longer DIR-before-STEP lead for the DM542T
 
 spi:
   miso_pin: gpio.19
@@ -111,7 +118,6 @@ relay:
   spinup_ms: 2000
   spindown_ms: 1000
   tool_num: 0
-  speed_map: 0=0.000% 0=100.000% 1=100.000%
   off_on_alarm: true
 
 start:

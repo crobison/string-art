@@ -110,6 +110,7 @@ photo.jpg
   → generator/stringart.py photo.jpg --nails 288 --hoop-diameter 0.6
   → generator/out/photo.json (+ .png preview, .txt hand list)
   → machine/post.py generator/out/photo.json            → photo.gcode
-  → machine/post.py generator/out/photo.json --drill    → photo_drill.gcode (once per board)
+  → machine/post.py generator/out/photo.json --drill --z-surface <MPos Z at the board>
+                                                       → photo_drill.gcode (once per board)
   → upload to FluidNC (WebUI), home, tie thread to nail 0, run
 ```

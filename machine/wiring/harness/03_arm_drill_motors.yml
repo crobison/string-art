@@ -10,54 +10,60 @@ connectors:
     type: PiBot V4.96 Pro
     subtype: slot 2 green terminal (Y, TMC2209 fitted)
     pinlabels:
+    - 2B
+    - 2A
     - 1A
     - 1B
-    - 2A
-    - 2B
     hide_disconnected_pins: true
     show_name: false
-    notes: 1A/1B = coil A (black/green), 2A/2B = coil B (red/blue).
+    notes: 'No pin labels on the board. Pins 1-4 are 2B, 2A, 1A, 1B:
+
+      one coil on the two screws at each end.'
   NEMA17_Y:
     type: NEMA17 17HE08-1004S pancake
     subtype: threader motor (Y)
     pinlabels:
-    - A1
-    - A2
-    - B1
-    - B2
+    - A+
+    - A-
+    - B+
+    - B-
     hide_disconnected_pins: true
     show_name: false
     pincolors:
     - BK
+    - BU
     - GN
     - RD
-    - BU
+    notes: 'Coils: black-blue and green-red, about 3.6 ohm each.'
   PIBOT_ZM:
     type: PiBot V4.96 Pro
     subtype: slot 3 green terminal (Z, TMC2209 fitted)
     pinlabels:
+    - 2B
+    - 2A
     - 1A
     - 1B
-    - 2A
-    - 2B
     hide_disconnected_pins: true
     show_name: false
-    notes: 1A/1B = coil A (black/green), 2A/2B = coil B (red/blue).
+    notes: 'No pin labels on the board. Pins 1-4 are 2B, 2A, 1A, 1B:
+
+      one coil on the two screws at each end.'
   NEMA17_Z:
     type: NEMA17 17HE08-1004S pancake
     subtype: drill feed motor (Z)
     pinlabels:
-    - A1
-    - A2
-    - B1
-    - B2
+    - A+
+    - A-
+    - B+
+    - B-
     hide_disconnected_pins: true
     show_name: false
     pincolors:
     - BK
+    - BU
     - GN
     - RD
-    - BU
+    notes: 'Coils: black-blue and green-red, about 3.6 ohm each.'
 cables:
   Y motor cable:
     category: bundle
@@ -65,64 +71,64 @@ cables:
     show_equiv: false
     colors:
     - BK
+    - BU
     - GN
     - RD
-    - BU
   Z motor cable:
     category: bundle
     gauge: 22 AWG
     show_equiv: false
     colors:
     - BK
+    - BU
     - GN
     - RD
-    - BU
 connections:
 - - PIBOT_YM:
     - 1A
   - Y motor cable:
     - 1
   - NEMA17_Y:
-    - A1
+    - A+
 - - PIBOT_YM:
     - 1B
   - Y motor cable:
     - 2
   - NEMA17_Y:
-    - A2
+    - A-
 - - PIBOT_YM:
     - 2A
   - Y motor cable:
     - 3
   - NEMA17_Y:
-    - B1
+    - B+
 - - PIBOT_YM:
     - 2B
   - Y motor cable:
     - 4
   - NEMA17_Y:
-    - B2
+    - B-
 - - PIBOT_ZM:
     - 1A
   - Z motor cable:
     - 1
   - NEMA17_Z:
-    - A1
+    - A+
 - - PIBOT_ZM:
     - 1B
   - Z motor cable:
     - 2
   - NEMA17_Z:
-    - A2
+    - A-
 - - PIBOT_ZM:
     - 2A
   - Z motor cable:
     - 3
   - NEMA17_Z:
-    - B1
+    - B+
 - - PIBOT_ZM:
     - 2B
   - Z motor cable:
     - 4
   - NEMA17_Z:
-    - B2
+    - B-

@@ -29,11 +29,11 @@ connectors:
     subtype: on-board relay terminal (gpio26)
     pinlabels:
     - COM
-    - 'NO'
     - NC
+    - 'NO'
     hide_disconnected_pins: true
     show_name: false
-    notes: GPIO26 function jumper must be on Relay Output.
+    notes: 'RLY jumper on relay. Middle pin is NC: use the two outer pins.'
   DRILL:
     type: 555 drill motor
     subtype: 24 V, solder tabs

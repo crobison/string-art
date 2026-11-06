@@ -85,6 +85,8 @@ svg .name-d { font: 700 15px var(--display); fill: #1d221f; letter-spacing: .03e
 svg .cap { font: 600 13px var(--body); fill: var(--mat-ink); }
 svg .cap2 { font: 400 12px var(--body); fill: var(--mat-dim); }
 svg .tb { fill: #2f8f46; stroke: #173f22; }
+svg .ob { fill: #f07c1a; stroke: #a24f0b; }
+svg .xh { fill: #1f9e8f; stroke: #0f5048; }
 svg .hdr { fill: #17181a; stroke: #000; }
 svg .pin { fill: #d7b25a; }
 svg .screw { fill: #cfd3d8; stroke: #5d6168; }
@@ -150,25 +152,28 @@ footer { margin-top: 72px; padding-top: 20px; border-top: 1px solid var(--line);
     <div>
       <h3>Before you start</h3>
       <ul>
-        <li>Tools: small flat screwdriver, wire stripper, multimeter, ferrule crimper, soldering iron (step 5 only).</li>
-        <li>Wire: 18 AWG red and black for power, 22 AWG for signals.</li>
+        <li>Tools: small flat screwdriver, wire stripper, multimeter with a continuity beeper, ferrule crimper, soldering iron (step 5 only).</li>
+        <li>Wire: 18 AWG red and black for power, 22 AWG for signals. Ferrules to suit both.</li>
         <li>Two <b>Wago 221-415</b> lever nuts. One is the +24 V bus, one is the GND bus.</li>
+        <li>Three <b>JST-XH 2.54 mm 3-pin</b> plugs (or a crimp kit) for the endstop cables. The limit inputs are sockets, not screw terminals.</li>
+        <li>A barrel-jack-to-screw adapter rated <b>10 A</b> that matches the brick's tip. Many are rated 3–5 A. Or cut the brick's plug off and put its leads straight into the lever nuts.</li>
       </ul>
     </div>
     <div class="call warn">
-      <h4>Three rules</h4>
+      <h4>Four rules</h4>
       <ol>
         <li>The power brick stays unplugged from the wall while you wire.</li>
         <li>Never plug or unplug a motor while the power is on. It destroys the driver.</li>
         <li>Red is always +, black is always GND. Check with the meter before the first power-up.</li>
+        <li>The brick is set to 24.0 V and never higher. The board's main input is rated 9–24 V.</li>
       </ol>
     </div>
     <div>
       <h3>Reading the drawings</h3>
       <div class="legend" id="legend"></div>
       <p class="mat-note" style="margin-top:10px">An orange dashed box marks the terminals you touch in that step.
-        Header positions on the PiBot drawing are simplified. On the real board, always match the
-        <b>labels printed next to the pins</b>.</p>
+        The PiBot drawing is simplified, but every connector is on the correct edge of the board. Several of the
+        board's terminals have <b>no pin labels</b>. Where that matters, the step says how to find each pin with the meter.</p>
     </div>
   </div>
 
@@ -181,30 +186,31 @@ footer { margin-top: 72px; padding-top: 20px; border-top: 1px solid var(--line);
         <li>Board unpowered, USB unplugged, nothing on any terminal.</li>
         <li>Screw on the Wi-Fi antenna. Without it there is no Wi-Fi. Plug in the OLED. A TF card is optional.</li>
         <li>Use tweezers or pliers for the jumpers (the small plastic caps that bridge two pins). Fit or remove each one, then check it against the table again.</li>
+        <li>Most jumper headers here have <b>3 pins</b>: the jumper joins the middle pin to one side, so the side matters. The table says which.</li>
       </ol></div>
       <div class="call warn"><h4>Careful</h4><ol>
         <li>Each of the six driver slots has a <b>StepStick socket</b>: two rows of 8 female header pins that a plug-in driver board pushes into. Your TMC2209s are StepSticks, and they go in the sockets of slots 2 and 3.</li>
-        <li>Slot 1 (X on the silkscreen) is different. The DM542T is an external driver and doesn't plug in. Fit all four of slot 1's routing jumpers (STP, DIR, EN, GND), and <b>leave slot 1's socket empty</b>.</li>
+        <li>Slot 1 (X on the silkscreen) is different. The DM542T is an external driver and doesn't plug in. Fit all four of slot 1's routing jumpers (header H4, beside the socket), and <b>leave slot 1's socket empty</b>.</li>
         <li>Never put a TMC2209 in slot 1. With the routing jumpers in, its 24 V motor outputs land on the board's logic lines. That destroys the driver and the board's chips.</li>
-        <li>The board ships with only three jumpers fitted (VDD, SW-VCC, GPIO26). Every other jumper in this table is one you add.</li>
+        <li>The board ships with only three jumpers fitted (VDD, SW-VCC, RLY). Every other jumper in this table is one you add.</li>
       </ol></div>
     </div>
     <div class="table-wrap"><table class="jt">
       <thead><tr><th>#</th><th>Jumper</th><th>Factory</th><th>Set to</th><th>Why</th></tr></thead>
       <tbody>
-        <tr><td>⑳</td><td>USB 5V</td><td>check</td><td class="set">Removed</td><td>Feeds USB 5 V into the board for bench use. PiBot says to remove it whenever the 24 V supply is connected.</td></tr>
-        <tr><td>⑫</td><td>VDD (driver logic level)</td><td>3.3 V</td><td class="set">5 V</td><td>The DM542T's optocoupler inputs want 5 V signals. TMC2209s run on anything from 3.3 to 5 V, and VDD also sets the high level for MS1/MS2.</td></tr>
-        <tr><td>⑦</td><td>SW-VCC (limit inputs)</td><td>5 V</td><td class="set">5 V (leave)</td><td>Correct for plain mechanical switches. Vmot-main is only for 12–24 V NPN sensors.</td></tr>
-        <tr><td>⑬</td><td>GPIO26 function</td><td>Relay Output</td><td class="set">Relay Output (leave)</td><td>Drives the on-board relay that switches the drill (step 5).</td></tr>
-        <tr><td>⑯ ⑰</td><td>Slot routing jumpers, slot 1 (X)</td><td>none</td><td class="set">Fitted</td><td>Sends slot 1's STP, DIR, EN and GND out to its green terminal for the DM542T. This is PiBot's "external standard driver" mode.</td></tr>
+        <tr><td>⑳</td><td>USB 5V</td><td>not fitted</td><td class="set">None</td><td>Feeds USB 5 V into the board for bench use only. PiBot says it must be off whenever the 24 V supply is connected.</td></tr>
+        <tr><td>⑫</td><td>VDD, labelled "Driver Logic Signal level" (VDDSEL1)</td><td>3V3</td><td class="set">+5V side</td><td>The DM542T's inputs need 5 V signals. TMC2209s run on anything from 3.3 to 5 V, and VDD also sets the high level for MS1/MS2.</td></tr>
+        <tr><td>⑦</td><td>SW-VCC (SWVSEL1), limit inputs</td><td>+5V</td><td class="set">+5V (leave)</td><td>Correct for plain mechanical switches. The VMOT side is only for 12–24 V NPN sensors.</td></tr>
+        <tr><td>⑬</td><td>RLY (GPIO26 function), in the header marked SLP RST NULL MS2 MS1 RLY</td><td>Relay</td><td class="set">Relay (leave)</td><td>Lets gpio26 drive the on-board relay that switches the drill (step 5). Note which side it is on: MS1 and MS2 go on the same side.</td></tr>
+        <tr><td>⑯ ⑰</td><td>Slot 1 routing jumpers (H4), 4 of them</td><td>none</td><td class="set">All 4 fitted</td><td>Sends slot 1's EN, STP, DIR and GND out to its green terminal for the DM542T. This is PiBot's "external standard driver" mode.</td></tr>
         <tr><td>⑯ ⑰</td><td>Slot routing jumpers, slots 2–6</td><td>none</td><td class="set">None</td><td>Slots 2 (Y) and 3 (Z) hold the TMC2209s, which drive their green terminals directly.</td></tr>
-        <tr><td>⑭</td><td>MS1 and MS2 (one pair shared by all six sockets)</td><td>none</td><td class="set">Both fitted</td><td>MS1 = MS2 = high gives the TMC2209 1/16 microstepping (3200 steps/turn), which the config assumes. MS3 is not set in the YAML because that socket pin is PDN_UART on a TMC2209.</td></tr>
-        <tr><td>⑭</td><td>RST / SLP</td><td>none</td><td class="set">None</td><td>Only A4988 and DRV8825 drivers need this bridge. The TMC2209 doesn't.</td></tr>
+        <tr><td>⑭</td><td>MS1 and MS2 (one pair shared by all six sockets)</td><td>none</td><td class="set">Both fitted, same side as RLY</td><td>That side is VDD, so MS1 = MS2 = high: the TMC2209's 1/16 microstepping (3200 steps/turn), which the config assumes. On the other side they pull low and the drivers run at 1/8.</td></tr>
+        <tr><td>⑭</td><td>NULL, RST, SLP</td><td>none</td><td class="set">None</td><td>NULL (the MS3 position) isn't connected on this board. RST and SLP are only for A4988/DRV8825 drivers. An SLP jumper to VDD would hold the TMC2209s' CLK pin high.</td></tr>
         <tr><td>⑲</td><td>SPI jumpers</td><td>none</td><td class="set">None</td><td>Only for SPI-mode drivers (TMC2130, TMC5160). Ours run standalone on step/dir.</td></tr>
       </tbody>
     </table></div>
     <div class="call check"><h4>Check before moving on</h4><ol>
-      <li>Count the jumpers: <b>9 on the board in total</b>, whatever the board shipped with. VDD on 5V (1), SW-VCC on 5V (1), GPIO26 on Relay (1), slot 1 routing STP, DIR, EN and GND (4), MS1 and MS2 (2). USB-5V has no jumper. Slots 2–6 have no routing jumpers. No jumpers on RST/SLP or SPI.</li>
+      <li>Count the jumpers: <b>9 on the board in total</b>, whatever the board shipped with. VDD on +5V (1), SW-VCC on +5V (1), RLY on relay (1), slot 1 routing (4), MS1 and MS2 on the same side as RLY (2). Nothing on USB-5V, NULL, RST, SLP, SPI or slots 2–6.</li>
       <li>If your count isn't 9, compare each row of the table above with the board until it is. Spare jumpers go in a bag, not on unused pins.</li>
       <li>Optional meter check once the board has 24 V (section B): socket 2's MS1 and MS2 pins read about 5 V to GND. The bench test in section C proves this anyway.</li>
     </ol></div>
@@ -215,11 +221,16 @@ footer { margin-top: 72px; padding-top: 20px; border-top: 1px solid var(--line);
       <p class="goal">The board ships with FluidNC 3.9.9 already flashed and a factory test config. You don't need to flash anything. You only upload our two config files.</p></div></div>
     <div class="callouts">
       <div class="call do"><h4>Power the bare board</h4><ol>
-        <li>Wire only the first two pairs of step 1: brick → lever nuts → <b>Vmot-main</b>. Nothing else connected yet.</li>
+        <li>The power inputs are the orange connectors on the board's bottom edge, labelled underneath: <b>Vmot-Driver</b>, <b>Vmot</b>, then MOSFET and RELAY.</li>
+        <li>Wire only the first two pairs of step 1: brick → lever nuts → <b>Vmot</b> (+ and − are printed under it). Vmot is a plug: pull it straight off, wire it, push it back on. Nothing else connected yet.</li>
         <li>Plug in the brick. The 5 V LED lights and the OLED shows FluidNC.</li>
+        <li>Meter across Vmot-Driver: about 0 V. It's a separate input that only feeds the driver sockets.</li>
+      </ol></div>
+      <div class="call warn"><h4>Not a power input</h4><ol>
+        <li>The black 5-pin header near the ESP32 is labelled GP27, GP25, +5V, <b>VMOT Main</b>, GND. It's an <b>output</b> for add-on modules. Never connect the brick there.</li>
       </ol></div>
       <div class="call do"><h4>Open the web interface</h4><ol>
-        <li>On a laptop or phone, join Wi-Fi <code>fluidnc</code>, password <code>12345678</code>.</li>
+        <li>On a laptop or phone, join Wi-Fi <code>FluidNC</code>, password <code>12345678</code>.</li>
         <li>Browse to <code>http://192.168.0.1</code>. That opens FluidNC's WebUI.</li>
         <li>Optional: PiBot's own <a href="https://wiki.pibot.com/doku.php?id=pibot_cnc_laser_series:v496_pro:check_list_before_use:start">60-minute factory checklist</a> tests every input and output with the factory config. Run it now if you want a known-good board before you start.</li>
       </ol></div>
@@ -233,13 +244,15 @@ footer { margin-top: 72px; padding-top: 20px; border-top: 1px solid var(--line);
 $Bye                       (restarts the board)
 $SS                        (startup log: look for errors)
 $CD                        (prints the config it actually loaded)</pre>
-      <p>The startup log should end without any <code>error</code> or <code>Bad config</code> lines. <code>$CD</code> should show
-        <code>name: StringArtBench</code>. To go back to the factory test config, send <code>$Config/Filename=config.yaml</code> and <code>$Bye</code>.</p>
+      <p>The startup log should have no <code>[MSG:ERR:</code> lines. <code>$CD</code> should show
+        <code>name: StringArtBench</code>. A config problem leaves the board in alarm, and <code>$X</code> then answers
+        "Configuration is invalid". To go back to the factory test config, send <code>$Config/Filename=config.yaml</code> and <code>$Bye</code>.</p>
     </div>
     <div class="call warn"><h4>Only if you ever need to re-flash</h4><ol>
       <li>Use Chrome or Edge, which can open serial ports from a web page. Go to <code>installer.fluidnc.com</code>, plug in USB and pick the port.</li>
-      <li>Choose Install → <b>WiFi</b> build → <b>Fresh install</b> → <b>WebUI 2</b>, then wait for 100%. If it gets stuck in a boot loop, hold the BOOT button for 3 s and release.</li>
-      <li>Linux: the board's CP210x USB chip needs no driver, but your user must be in the dialout group: <code>sudo usermod -aG dialout $USER</code>, then log out and back in.</li>
+      <li>Choose <b>Install FluidNC</b>, then pick release <b>v3.9.9</b> to match the factory firmware (the newest 4.x also accepts our configs). Then processor <b>esp32</b> if asked, firmware variant <b>wifi</b>, installation type <b>fresh-install</b>. In the confirm box, under Extra Options, tick <b>Install WebUI-2</b>, then Install.</li>
+      <li>If it reports "Bootloader not active", hold the board's BOOT button while it connects.</li>
+      <li>Linux: the board's CP2102 USB chip needs no driver, but your user must be in the dialout group (uucp on Arch): <code>sudo usermod -aG dialout $USER</code>, then log out and back in.</li>
       <li>A fresh install wipes the flash, so upload both YAML files again afterwards.</li>
     </ol></div>
   </section>
@@ -250,38 +263,39 @@ $CD                        (prints the config it actually loaded)</pre>
         exactly once, so it checks the microstep setting as well as the wiring. Uses <code>bench.yaml</code>, which has no homing, so you can jog straight away.</p></div></div>
     <div class="callouts">
       <div class="call do"><h4>Test 0: signal LEDs, no motor</h4><ol>
-        <li>Board on Vmot-main only, <code>bench.yaml</code> active. Each slot's EN LED is lit.</li>
-        <li>Send <code>$J=G91 X10 F300</code>, then <code>$J=G91 Y10 F600</code>. Slot 1's and then slot 2's CLK and DIR LEDs flicker while the axis "moves". This is PiBot's test 2.8.</li>
+        <li>Board on Vmot only, <code>bench.yaml</code> active. The EN LEDs of slots 1–3 are <b>off</b>: the config keeps the drivers enabled, and a lit EN LED means that driver is disabled.</li>
+        <li>Send <code>$J=G91 X10 F300</code>, then <code>$J=G91 Y10 F600</code>. Slot 1's and then slot 2's STEP and DIR LEDs flicker while the axis "moves". This is PiBot's test 2.8.</li>
       </ol></div>
       <div class="call do"><h4>Test 1: threader pancake on a TMC2209</h4><ol>
-        <li>Brick unplugged. Add step 1's Vmot-driver pair. TMC2209 in socket 2, EN pin to the EN mark, Vref set to 0.9–1.0 V (step 3).</li>
-        <li>Brick unplugged again. Connect the pancake to slot 2's terminal: black 1A, green 1B, red 2A, blue 2B. Stick a tape flag on the shaft.</li>
+        <li>Brick unplugged. Add step 1's Vmot-Driver pair. TMC2209 in socket 2, EN pin to the EN mark.</li>
+        <li>Power on and set Vref to 0.9–1.0 V (step 3). It reads 0 V until Vmot-Driver has 24 V.</li>
+        <li>Brick unplugged again. Meter the pancake's coils and connect it to slot 2's terminal as in step 3: black and blue on the two screws at one end, green and red on the two at the other. Stick a tape flag on the shaft.</li>
         <li>Power on. Send <code>$J=G91 Y40 F600</code>: the shaft turns <b>exactly once</b> in 4 s. Send <code>$J=G91 Y-40 F600</code>: it turns back.</li>
       </ol></div>
       <div class="call do"><h4>Test 2: platter NEMA23 on the DM542T</h4><ol>
-        <li>Brick unplugged. Wire step 1's DM542T pair and all of step 2, with the DIP switches set.</li>
+        <li>Brick unplugged. Wire step 1's DM542T pair and all of step 2, with the DIP switches set and the DM542T's 5V/24V selector (if it has one) on <b>5V</b>.</li>
         <li>Power on. The DM542T's green LED lights, and the red one stays off.</li>
-        <li>Send <code>$J=G91 X72 F600</code>: the NEMA23 shaft turns <b>exactly once</b> in about 7 s. (72 nails × 44.444 = 3200 steps.) <code>$J=G91 X-72 F600</code> brings it back.</li>
+        <li>Send <code>$J=G91 X72 F600</code>: the NEMA23 shaft turns <b>exactly once</b> in about 7.5 s. (72 nails × 44.444 = 3200 steps.) <code>$J=G91 X-72 F600</code> brings it back.</li>
       </ol></div>
     </div>
     <div class="table-wrap"><table class="jt">
       <thead><tr><th>You see</th><th>Cause</th><th>Fix</th></tr></thead>
       <tbody>
         <tr><td>Exactly one turn</td><td>Everything is right</td><td>Move on</td></tr>
-        <tr><td>Pancake turns twice</td><td>TMC2209 at 1/8: the MS jumpers aren't pulling high</td><td>Check MS1/MS2 jumpers and that VDD is on 5V</td></tr>
-        <tr><td>Pancake turns ½ or ¼ turn</td><td>TMC2209 at 1/32 or 1/64: only one MS jumper is working</td><td>Re-seat both MS jumpers</td></tr>
+        <tr><td>Pancake turns twice</td><td>TMC2209 at 1/8: MS1/MS2 jumpers missing or on the wrong side</td><td>Both on the same side as RLY (section A)</td></tr>
+        <tr><td>Pancake turns ½ or ¼ turn</td><td>TMC2209 at 1/32 or 1/64: only one MS jumper is high</td><td>Put MS1 and MS2 on the same side as RLY, and re-seat both</td></tr>
         <tr><td>NEMA23 turns half a turn</td><td>DM542T at 6400</td><td>SW5–8 = ON ON OFF ON</td></tr>
         <tr><td>NEMA23 turns twice</td><td>DM542T at 1600 (SW5–8 = OFF OFF ON ON)</td><td>SW5–8 = ON ON OFF ON</td></tr>
-        <tr><td>Motor buzzes or jitters but doesn't turn</td><td>A coil pair is split across A and B</td><td>Power off. Find the pairs with the meter (a few Ω between the two wires of one coil) and re-land them</td></tr>
-        <tr><td>Silent, shaft turns freely by hand</td><td>No motor power or driver disabled</td><td>TMC2209: is 24 V on Vmot-driver? Is Vref above 0? DM542T: is the green LED on?</td></tr>
-        <tr><td>Silent, but slot LEDs don't flicker</td><td>Config problem, or the controller is in alarm</td><td>Send <code>$X</code>, then check <code>$SS</code> for config errors</td></tr>
-        <tr><td>DM542T red LED</td><td>Over-current, motor wiring short, or supply too low</td><td>Power off and check the motor leads and 24 V</td></tr>
+        <tr><td>Motor buzzes or jitters but doesn't turn</td><td>The two wires of one coil are split across the two coil pairs</td><td>Power off. Find the pairs with the meter (pancake about 3.6 Ω, NEMA23 about 1 Ω between the two wires of a coil) and put each coil on its own pair of screws</td></tr>
+        <tr><td>Silent, shaft turns freely by hand</td><td>No motor power, driver disabled, or no signal reaching it</td><td>TMC2209: is 24 V on Vmot-Driver? Is Vref above 0? DM542T: is the green LED on, and is the 5V/24V selector on 5V?</td></tr>
+        <tr><td>Silent, but slot LEDs don't flicker</td><td>Config problem, or the controller is in alarm</td><td>Send <code>$X</code>, then check <code>$SS</code> for <code>[MSG:ERR:</code> lines</td></tr>
+        <tr><td>DM542T red LED blinks</td><td>1 blink: over-current or a short in the motor wiring. 2 blinks: over-voltage</td><td>Power off and check the motor leads and the brick's voltage</td></tr>
         <tr><td>Turns the wrong way</td><td>Normal: direction is arbitrary until set</td><td>Fix it later, after assembly: add <code>:low</code> to that axis's <code>direction_pin</code></td></tr>
       </tbody>
     </table></div>
     <div class="call check"><h4>When both motors pass</h4><ol>
       <li>Power off and finish wiring with steps 1–5 below.</li>
-      <li>Then switch to the real config: <code>$Config/Filename=stringart.yaml</code> and <code>$Bye</code>. It requires homing, so it won't jog until the endstops are in and <code>$H</code> has run.</li>
+      <li>Then switch to the real config: <code>$Config/Filename=stringart.yaml</code> and <code>$Bye</code>. It expects homing, so it starts locked. <code>$H</code> homes once the endstops are in. <code>$X</code> unlocks without homing, but then nail 0 is wherever the platter happens to be.</li>
     </ol></div>
   </section>
 
@@ -293,13 +307,13 @@ $CD                        (prints the config it actually loaded)</pre>
     <div class="call check"><h4>Checklist</h4><ol>
       <li>Every motor is plugged in, and stays plugged in while the power is on.</li>
       <li>No loose copper strands at any screw terminal. Tug every wire.</li>
-      <li>Meter: 24 V on the lever nuts.</li>
-      <li>Jumpers still match section A. Slot 1's socket is empty.</li>
+      <li>Meter: 24 V on the lever nuts, not more.</li>
+      <li>Jumpers still match section A (9 in total). Slot 1's socket is empty.</li>
       <li>Both TMC2209s point the right way, Vref set to 0.9–1.0 V.</li>
-      <li><code>$Config/Filename=stringart.yaml</code>, <code>$Bye</code>, then <code>$SS</code> shows no errors.</li>
+      <li><code>$Config/Filename=stringart.yaml</code>, <code>$Bye</code>, then <code>$SS</code> shows no <code>[MSG:ERR:</code> lines.</li>
       <li>Send <code>?</code>. There is no <code>Pn:</code> entry with every switch at rest.</li>
       <li>Home with <code>$H</code>: Y and Z home first, then X finds nail 0. Keep a hand on the wall plug the first time.</li>
-      <li>Drill test with the bit out: <code>M3 S1000</code> spins it, <code>M5</code> stops it.</li>
+      <li>Drill test with the bit out: <code>M3 S1000</code> spins it after the 2 s spin-up wait, <code>M5</code> stops it. If the board resets when the drill starts, see step 5.</li>
     </ol></div>
   </section>
 
@@ -309,12 +323,12 @@ $CD                        (prints the config it actually loaded)</pre>
       against the schematic's netlist when the page is built.</p>
     <p>Pins, jumpers and the flashing steps follow PiBot's
       <a href="https://wiki.pibot.com/doku.php?id=pibot_cnc_laser_series:v496_pro:introduction:start">V4.96 Pro wiki</a> and its
-      factory test YAML, checked 2026-11-04. The config is <code>machine/fluidnc-config.yaml</code>, and the bench config is <code>machine/fluidnc-bench.yaml</code>.</p>
+      factory test YAML and schematic, checked 2026-11-05. The config is <code>machine/fluidnc-config.yaml</code>, and the bench config is <code>machine/fluidnc-bench.yaml</code>.</p>
   </footer>
 </div>
 
 <script>
-const STEPS = [{"name":"01_power","title":"Step 1: 24 V power distribution","wires":[{"cable":"PSU leads","color":"RD","gauge":"18 AWG","net":"+24V","from":{"id":"PSU","type":"24 V power brick","subtype":"barrel-to-screw adapter","pin":"+"},"to":{"id":"WAGO+","type":"Wago 221-415 lever nut","subtype":"+24 V bus (5-way)","pin":"+24V 1"}},{"cable":"PSU leads","color":"BK","gauge":"18 AWG","net":"GND","from":{"id":"PSU","type":"24 V power brick","subtype":"barrel-to-screw adapter","pin":"-"},"to":{"id":"WAGO-","type":"Wago 221-415 lever nut","subtype":"GND bus (5-way)","pin":"GND 1"}},{"cable":"PiBot Vmot-main","color":"RD","gauge":"18 AWG","net":"+24V","from":{"id":"WAGO+","type":"Wago 221-415 lever nut","subtype":"+24 V bus (5-way)","pin":"+24V 2"},"to":{"id":"PIBOT_PWR","type":"PiBot V4.96 Pro","subtype":"Vmot-main and Vmot-driver inputs","pin":"MAIN +"}},{"cable":"PiBot Vmot-main","color":"BK","gauge":"18 AWG","net":"GND","from":{"id":"WAGO-","type":"Wago 221-415 lever nut","subtype":"GND bus (5-way)","pin":"GND 2"},"to":{"id":"PIBOT_PWR","type":"PiBot V4.96 Pro","subtype":"Vmot-main and Vmot-driver inputs","pin":"MAIN -"}},{"cable":"PiBot Vmot-driver","color":"RD","gauge":"18 AWG","net":"+24V","from":{"id":"WAGO+","type":"Wago 221-415 lever nut","subtype":"+24 V bus (5-way)","pin":"+24V 3"},"to":{"id":"PIBOT_PWR","type":"PiBot V4.96 Pro","subtype":"Vmot-main and Vmot-driver inputs","pin":"DRV +"}},{"cable":"PiBot Vmot-driver","color":"BK","gauge":"18 AWG","net":"GND","from":{"id":"WAGO-","type":"Wago 221-415 lever nut","subtype":"GND bus (5-way)","pin":"GND 3"},"to":{"id":"PIBOT_PWR","type":"PiBot V4.96 Pro","subtype":"Vmot-main and Vmot-driver inputs","pin":"DRV -"}},{"cable":"DM542T power","color":"RD","gauge":"18 AWG","net":"+24V","from":{"id":"WAGO+","type":"Wago 221-415 lever nut","subtype":"+24 V bus (5-way)","pin":"+24V 4"},"to":{"id":"DM542T_HV","type":"DM542T","subtype":"power + motor terminal","pin":"+VDC"}},{"cable":"DM542T power","color":"BK","gauge":"18 AWG","net":"GND","from":{"id":"WAGO-","type":"Wago 221-415 lever nut","subtype":"GND bus (5-way)","pin":"GND 4"},"to":{"id":"DM542T_HV","type":"DM542T","subtype":"power + motor terminal","pin":"GND"}}]},{"name":"02_platter","title":"Step 2: platter motor (X) on the DM542T","wires":[{"cable":"X step/dir","color":"YE","gauge":"22 AWG","net":"X_STEP","from":{"id":"PIBOT_X","type":"PiBot V4.96 Pro","subtype":"slot 1 green terminal (X, routing jumpers in)","pin":"STP"},"to":{"id":"DM542T_SIG","type":"DM542T","subtype":"signal terminal","pin":"PUL+"}},{"cable":"X step/dir","color":"WH","gauge":"22 AWG","net":"X_DIR","from":{"id":"PIBOT_X","type":"PiBot V4.96 Pro","subtype":"slot 1 green terminal (X, routing jumpers in)","pin":"DIR"},"to":{"id":"DM542T_SIG","type":"DM542T","subtype":"signal terminal","pin":"DIR+"}},{"cable":"X step/dir","color":"BK","gauge":"22 AWG","net":"GND","from":{"id":"PIBOT_X","type":"PiBot V4.96 Pro","subtype":"slot 1 green terminal (X, routing jumpers in)","pin":"GND"},"to":{"id":"DM542T_SIG","type":"DM542T","subtype":"signal terminal","pin":"PUL-"}},{"cable":"NEMA23 leads (18 AWG)","color":"BK","gauge":"18 AWG","net":"X_A+","from":{"id":"NEMA23","type":"NEMA23 23HS45-4204S","subtype":"platter motor (X), 4 flying leads","pin":"A+"},"to":{"id":"DM542T_HV","type":"DM542T","subtype":"power + motor terminal","pin":"A+"}},{"cable":"NEMA23 leads (18 AWG)","color":"GN","gauge":"18 AWG","net":"X_A-","from":{"id":"NEMA23","type":"NEMA23 23HS45-4204S","subtype":"platter motor (X), 4 flying leads","pin":"A-"},"to":{"id":"DM542T_HV","type":"DM542T","subtype":"power + motor terminal","pin":"A-"}},{"cable":"NEMA23 leads (18 AWG)","color":"RD","gauge":"18 AWG","net":"X_B+","from":{"id":"NEMA23","type":"NEMA23 23HS45-4204S","subtype":"platter motor (X), 4 flying leads","pin":"B+"},"to":{"id":"DM542T_HV","type":"DM542T","subtype":"power + motor terminal","pin":"B+"}},{"cable":"NEMA23 leads (18 AWG)","color":"BU","gauge":"18 AWG","net":"X_B-","from":{"id":"NEMA23","type":"NEMA23 23HS45-4204S","subtype":"platter motor (X), 4 flying leads","pin":"B-"},"to":{"id":"DM542T_HV","type":"DM542T","subtype":"power + motor terminal","pin":"B-"}},{"cable":"Jumper","color":"RD","gauge":"22 AWG","net":"GND","from":{"id":"DM542T_SIG","type":"DM542T","subtype":"signal terminal","pin":"PUL-"},"to":{"id":"DM542T_SIG","type":"DM542T","subtype":"signal terminal","pin":"DIR-"}}]},{"name":"03_arm_drill_motors","title":"Step 3: threader (Y) and drill-feed (Z) motors","wires":[{"cable":"Y motor cable","color":"BK","gauge":"22 AWG","net":"Y_A1","from":{"id":"PIBOT_YM","type":"PiBot V4.96 Pro","subtype":"slot 2 green terminal (Y, TMC2209 fitted)","pin":"1A"},"to":{"id":"NEMA17_Y","type":"NEMA17 17HE08-1004S pancake","subtype":"threader motor (Y)","pin":"A1"}},{"cable":"Y motor cable","color":"GN","gauge":"22 AWG","net":"Y_A2","from":{"id":"PIBOT_YM","type":"PiBot V4.96 Pro","subtype":"slot 2 green terminal (Y, TMC2209 fitted)","pin":"1B"},"to":{"id":"NEMA17_Y","type":"NEMA17 17HE08-1004S pancake","subtype":"threader motor (Y)","pin":"A2"}},{"cable":"Y motor cable","color":"RD","gauge":"22 AWG","net":"Y_B1","from":{"id":"PIBOT_YM","type":"PiBot V4.96 Pro","subtype":"slot 2 green terminal (Y, TMC2209 fitted)","pin":"2A"},"to":{"id":"NEMA17_Y","type":"NEMA17 17HE08-1004S pancake","subtype":"threader motor (Y)","pin":"B1"}},{"cable":"Y motor cable","color":"BU","gauge":"22 AWG","net":"Y_B2","from":{"id":"PIBOT_YM","type":"PiBot V4.96 Pro","subtype":"slot 2 green terminal (Y, TMC2209 fitted)","pin":"2B"},"to":{"id":"NEMA17_Y","type":"NEMA17 17HE08-1004S pancake","subtype":"threader motor (Y)","pin":"B2"}},{"cable":"Z motor cable","color":"BK","gauge":"22 AWG","net":"Z_A1","from":{"id":"PIBOT_ZM","type":"PiBot V4.96 Pro","subtype":"slot 3 green terminal (Z, TMC2209 fitted)","pin":"1A"},"to":{"id":"NEMA17_Z","type":"NEMA17 17HE08-1004S pancake","subtype":"drill feed motor (Z)","pin":"A1"}},{"cable":"Z motor cable","color":"GN","gauge":"22 AWG","net":"Z_A2","from":{"id":"PIBOT_ZM","type":"PiBot V4.96 Pro","subtype":"slot 3 green terminal (Z, TMC2209 fitted)","pin":"1B"},"to":{"id":"NEMA17_Z","type":"NEMA17 17HE08-1004S pancake","subtype":"drill feed motor (Z)","pin":"A2"}},{"cable":"Z motor cable","color":"RD","gauge":"22 AWG","net":"Z_B1","from":{"id":"PIBOT_ZM","type":"PiBot V4.96 Pro","subtype":"slot 3 green terminal (Z, TMC2209 fitted)","pin":"2A"},"to":{"id":"NEMA17_Z","type":"NEMA17 17HE08-1004S pancake","subtype":"drill feed motor (Z)","pin":"B1"}},{"cable":"Z motor cable","color":"BU","gauge":"22 AWG","net":"Z_B2","from":{"id":"PIBOT_ZM","type":"PiBot V4.96 Pro","subtype":"slot 3 green terminal (Z, TMC2209 fitted)","pin":"2B"},"to":{"id":"NEMA17_Z","type":"NEMA17 17HE08-1004S pancake","subtype":"drill feed motor (Z)","pin":"B2"}}]},{"name":"04_endstops","title":"Step 4: endstops (wired normally-closed)","wires":[{"cable":"X endstop","color":"BK","gauge":"22 AWG","net":"GND","from":{"id":"PIBOT_XL","type":"PiBot V4.96 Pro","subtype":"X limit input (gpio33)","pin":"GND"},"to":{"id":"SW_X","type":"Endstop switch","subtype":"X index: fires at nail 0","pin":"COM"}},{"cable":"X endstop","color":"WH","gauge":"22 AWG","net":"X_LIM","from":{"id":"PIBOT_XL","type":"PiBot V4.96 Pro","subtype":"X limit input (gpio33)","pin":"SIG"},"to":{"id":"SW_X","type":"Endstop switch","subtype":"X index: fires at nail 0","pin":"NC"}},{"cable":"Y endstop","color":"BK","gauge":"22 AWG","net":"GND","from":{"id":"PIBOT_YL","type":"PiBot V4.96 Pro","subtype":"Y limit input (gpio32)","pin":"GND"},"to":{"id":"SW_Y","type":"Endstop switch","subtype":"Y home: tip outside the ring","pin":"COM"}},{"cable":"Y endstop","color":"WH","gauge":"22 AWG","net":"Y_LIM","from":{"id":"PIBOT_YL","type":"PiBot V4.96 Pro","subtype":"Y limit input (gpio32)","pin":"SIG"},"to":{"id":"SW_Y","type":"Endstop switch","subtype":"Y home: tip outside the ring","pin":"NC"}},{"cable":"Z endstop","color":"BK","gauge":"22 AWG","net":"GND","from":{"id":"PIBOT_ZL","type":"PiBot V4.96 Pro","subtype":"Z limit input (gpio35)","pin":"GND"},"to":{"id":"SW_Z","type":"Endstop switch","subtype":"Z home: drill fully up","pin":"COM"}},{"cable":"Z endstop","color":"WH","gauge":"22 AWG","net":"Z_LIM","from":{"id":"PIBOT_ZL","type":"PiBot V4.96 Pro","subtype":"Z limit input (gpio35)","pin":"SIG"},"to":{"id":"SW_Z","type":"Endstop switch","subtype":"Z home: drill fully up","pin":"NC"}}]},{"name":"05_drill_relay","title":"Step 5: drill on the on-board relay","wires":[{"cable":"Drill 24 V (18 AWG)","color":"RD","gauge":"18 AWG","net":"+24V","from":{"id":"WAGO+","type":"Wago 221-415 lever nut","subtype":"+24 V bus (5-way)","pin":"+24V 5"},"to":{"id":"PIBOT_RLY","type":"PiBot V4.96 Pro","subtype":"on-board relay terminal (gpio26)","pin":"COM"}},{"cable":"Drill 24 V (18 AWG)","color":"RD","gauge":"18 AWG","net":"DRILL+","from":{"id":"PIBOT_RLY","type":"PiBot V4.96 Pro","subtype":"on-board relay terminal (gpio26)","pin":"NO"},"to":{"id":"DRILL","type":"555 drill motor","subtype":"24 V, solder tabs","pin":"+ (red dot)"}},{"cable":"Drill 24 V (18 AWG)","color":"BK","gauge":"18 AWG","net":"GND","from":{"id":"WAGO-","type":"Wago 221-415 lever nut","subtype":"GND bus (5-way)","pin":"GND 5"},"to":{"id":"DRILL","type":"555 drill motor","subtype":"24 V, solder tabs","pin":"-"}},{"cable":"Diode legs","color":"SR","gauge":"22 AWG","net":"DRILL+","from":{"id":"DRILL","type":"555 drill motor","subtype":"24 V, solder tabs","pin":"+ (red dot)"},"to":{"id":"D1","type":"1N5822 diode","subtype":"flyback, solder across the drill tabs","pin":"K (stripe)"}},{"cable":"Diode legs","color":"SR","gauge":"22 AWG","net":"GND","from":{"id":"DRILL","type":"555 drill motor","subtype":"24 V, solder tabs","pin":"-"},"to":{"id":"D1","type":"1N5822 diode","subtype":"flyback, solder across the drill tabs","pin":"A"}}]}];
+const STEPS = [{"name":"01_power","title":"Step 1: 24 V power distribution","wires":[{"cable":"PSU leads","color":"RD","gauge":"18 AWG","net":"+24V","from":{"id":"PSU","type":"24 V power brick","subtype":"barrel adapter rated 10 A, or bare leads","pin":"+"},"to":{"id":"WAGO+","type":"Wago 221-415 lever nut","subtype":"+24 V bus (5-way)","pin":"+24V 1"}},{"cable":"PSU leads","color":"BK","gauge":"18 AWG","net":"GND","from":{"id":"PSU","type":"24 V power brick","subtype":"barrel adapter rated 10 A, or bare leads","pin":"-"},"to":{"id":"WAGO-","type":"Wago 221-415 lever nut","subtype":"GND bus (5-way)","pin":"GND 1"}},{"cable":"PiBot Vmot","color":"RD","gauge":"18 AWG","net":"+24V","from":{"id":"WAGO+","type":"Wago 221-415 lever nut","subtype":"+24 V bus (5-way)","pin":"+24V 2"},"to":{"id":"PIBOT_PWR","type":"PiBot V4.96 Pro","subtype":"orange power inputs, bottom edge","pin":"Vmot +"}},{"cable":"PiBot Vmot","color":"BK","gauge":"18 AWG","net":"GND","from":{"id":"WAGO-","type":"Wago 221-415 lever nut","subtype":"GND bus (5-way)","pin":"GND 2"},"to":{"id":"PIBOT_PWR","type":"PiBot V4.96 Pro","subtype":"orange power inputs, bottom edge","pin":"Vmot -"}},{"cable":"PiBot Vmot-Driver","color":"RD","gauge":"18 AWG","net":"+24V","from":{"id":"WAGO+","type":"Wago 221-415 lever nut","subtype":"+24 V bus (5-way)","pin":"+24V 3"},"to":{"id":"PIBOT_PWR","type":"PiBot V4.96 Pro","subtype":"orange power inputs, bottom edge","pin":"Vmot-Driver +"}},{"cable":"PiBot Vmot-Driver","color":"BK","gauge":"18 AWG","net":"GND","from":{"id":"WAGO-","type":"Wago 221-415 lever nut","subtype":"GND bus (5-way)","pin":"GND 3"},"to":{"id":"PIBOT_PWR","type":"PiBot V4.96 Pro","subtype":"orange power inputs, bottom edge","pin":"Vmot-Driver -"}},{"cable":"DM542T power","color":"RD","gauge":"18 AWG","net":"+24V","from":{"id":"WAGO+","type":"Wago 221-415 lever nut","subtype":"+24 V bus (5-way)","pin":"+24V 4"},"to":{"id":"DM542T_HV","type":"DM542T","subtype":"power + motor terminal","pin":"+VDC"}},{"cable":"DM542T power","color":"BK","gauge":"18 AWG","net":"GND","from":{"id":"WAGO-","type":"Wago 221-415 lever nut","subtype":"GND bus (5-way)","pin":"GND 4"},"to":{"id":"DM542T_HV","type":"DM542T","subtype":"power + motor terminal","pin":"GND"}}]},{"name":"02_platter","title":"Step 2: platter motor (X) on the DM542T","wires":[{"cable":"X step/dir","color":"YE","gauge":"22 AWG","net":"X_STEP","from":{"id":"PIBOT_X","type":"PiBot V4.96 Pro","subtype":"slot 1 green terminal (X, routing jumpers in)","pin":"STP"},"to":{"id":"DM542T_SIG","type":"DM542T","subtype":"signal terminal","pin":"PUL+"}},{"cable":"X step/dir","color":"WH","gauge":"22 AWG","net":"X_DIR","from":{"id":"PIBOT_X","type":"PiBot V4.96 Pro","subtype":"slot 1 green terminal (X, routing jumpers in)","pin":"DIR"},"to":{"id":"DM542T_SIG","type":"DM542T","subtype":"signal terminal","pin":"DIR+"}},{"cable":"X step/dir","color":"BK","gauge":"22 AWG","net":"GND","from":{"id":"PIBOT_X","type":"PiBot V4.96 Pro","subtype":"slot 1 green terminal (X, routing jumpers in)","pin":"GND"},"to":{"id":"DM542T_SIG","type":"DM542T","subtype":"signal terminal","pin":"PUL-"}},{"cable":"NEMA23 leads (18 AWG)","color":"BK","gauge":"18 AWG","net":"X_A+","from":{"id":"NEMA23","type":"NEMA23 23HS45-4204S","subtype":"platter motor (X), 4 flying leads","pin":"A+"},"to":{"id":"DM542T_HV","type":"DM542T","subtype":"power + motor terminal","pin":"A+"}},{"cable":"NEMA23 leads (18 AWG)","color":"GN","gauge":"18 AWG","net":"X_A-","from":{"id":"NEMA23","type":"NEMA23 23HS45-4204S","subtype":"platter motor (X), 4 flying leads","pin":"A-"},"to":{"id":"DM542T_HV","type":"DM542T","subtype":"power + motor terminal","pin":"A-"}},{"cable":"NEMA23 leads (18 AWG)","color":"RD","gauge":"18 AWG","net":"X_B+","from":{"id":"NEMA23","type":"NEMA23 23HS45-4204S","subtype":"platter motor (X), 4 flying leads","pin":"B+"},"to":{"id":"DM542T_HV","type":"DM542T","subtype":"power + motor terminal","pin":"B+"}},{"cable":"NEMA23 leads (18 AWG)","color":"BU","gauge":"18 AWG","net":"X_B-","from":{"id":"NEMA23","type":"NEMA23 23HS45-4204S","subtype":"platter motor (X), 4 flying leads","pin":"B-"},"to":{"id":"DM542T_HV","type":"DM542T","subtype":"power + motor terminal","pin":"B-"}},{"cable":"Jumper","color":"RD","gauge":"22 AWG","net":"GND","from":{"id":"DM542T_SIG","type":"DM542T","subtype":"signal terminal","pin":"PUL-"},"to":{"id":"DM542T_SIG","type":"DM542T","subtype":"signal terminal","pin":"DIR-"}}]},{"name":"03_arm_drill_motors","title":"Step 3: threader (Y) and drill-feed (Z) motors","wires":[{"cable":"Y motor cable","color":"BK","gauge":"22 AWG","net":"Y_A1","from":{"id":"PIBOT_YM","type":"PiBot V4.96 Pro","subtype":"slot 2 green terminal (Y, TMC2209 fitted)","pin":"1A"},"to":{"id":"NEMA17_Y","type":"NEMA17 17HE08-1004S pancake","subtype":"threader motor (Y)","pin":"A+"}},{"cable":"Y motor cable","color":"BU","gauge":"22 AWG","net":"Y_A2","from":{"id":"PIBOT_YM","type":"PiBot V4.96 Pro","subtype":"slot 2 green terminal (Y, TMC2209 fitted)","pin":"1B"},"to":{"id":"NEMA17_Y","type":"NEMA17 17HE08-1004S pancake","subtype":"threader motor (Y)","pin":"A-"}},{"cable":"Y motor cable","color":"GN","gauge":"22 AWG","net":"Y_B1","from":{"id":"PIBOT_YM","type":"PiBot V4.96 Pro","subtype":"slot 2 green terminal (Y, TMC2209 fitted)","pin":"2A"},"to":{"id":"NEMA17_Y","type":"NEMA17 17HE08-1004S pancake","subtype":"threader motor (Y)","pin":"B+"}},{"cable":"Y motor cable","color":"RD","gauge":"22 AWG","net":"Y_B2","from":{"id":"PIBOT_YM","type":"PiBot V4.96 Pro","subtype":"slot 2 green terminal (Y, TMC2209 fitted)","pin":"2B"},"to":{"id":"NEMA17_Y","type":"NEMA17 17HE08-1004S pancake","subtype":"threader motor (Y)","pin":"B-"}},{"cable":"Z motor cable","color":"BK","gauge":"22 AWG","net":"Z_A1","from":{"id":"PIBOT_ZM","type":"PiBot V4.96 Pro","subtype":"slot 3 green terminal (Z, TMC2209 fitted)","pin":"1A"},"to":{"id":"NEMA17_Z","type":"NEMA17 17HE08-1004S pancake","subtype":"drill feed motor (Z)","pin":"A+"}},{"cable":"Z motor cable","color":"BU","gauge":"22 AWG","net":"Z_A2","from":{"id":"PIBOT_ZM","type":"PiBot V4.96 Pro","subtype":"slot 3 green terminal (Z, TMC2209 fitted)","pin":"1B"},"to":{"id":"NEMA17_Z","type":"NEMA17 17HE08-1004S pancake","subtype":"drill feed motor (Z)","pin":"A-"}},{"cable":"Z motor cable","color":"GN","gauge":"22 AWG","net":"Z_B1","from":{"id":"PIBOT_ZM","type":"PiBot V4.96 Pro","subtype":"slot 3 green terminal (Z, TMC2209 fitted)","pin":"2A"},"to":{"id":"NEMA17_Z","type":"NEMA17 17HE08-1004S pancake","subtype":"drill feed motor (Z)","pin":"B+"}},{"cable":"Z motor cable","color":"RD","gauge":"22 AWG","net":"Z_B2","from":{"id":"PIBOT_ZM","type":"PiBot V4.96 Pro","subtype":"slot 3 green terminal (Z, TMC2209 fitted)","pin":"2B"},"to":{"id":"NEMA17_Z","type":"NEMA17 17HE08-1004S pancake","subtype":"drill feed motor (Z)","pin":"B-"}}]},{"name":"04_endstops","title":"Step 4: endstops (wired normally-closed)","wires":[{"cable":"X endstop","color":"WH","gauge":"22 AWG","net":"X_LIM","from":{"id":"PIBOT_XL","type":"PiBot V4.96 Pro","subtype":"X limit input io33 (3-pin JST-XH)","pin":"SIG"},"to":{"id":"SW_X","type":"Endstop switch","subtype":"X index: fires at nail 0","pin":"NC"}},{"cable":"X endstop","color":"BK","gauge":"22 AWG","net":"GND","from":{"id":"PIBOT_XL","type":"PiBot V4.96 Pro","subtype":"X limit input io33 (3-pin JST-XH)","pin":"GND"},"to":{"id":"SW_X","type":"Endstop switch","subtype":"X index: fires at nail 0","pin":"COM"}},{"cable":"Y endstop","color":"WH","gauge":"22 AWG","net":"Y_LIM","from":{"id":"PIBOT_YL","type":"PiBot V4.96 Pro","subtype":"Y limit input io32 (3-pin JST-XH)","pin":"SIG"},"to":{"id":"SW_Y","type":"Endstop switch","subtype":"Y home: tip outside the ring","pin":"NC"}},{"cable":"Y endstop","color":"BK","gauge":"22 AWG","net":"GND","from":{"id":"PIBOT_YL","type":"PiBot V4.96 Pro","subtype":"Y limit input io32 (3-pin JST-XH)","pin":"GND"},"to":{"id":"SW_Y","type":"Endstop switch","subtype":"Y home: tip outside the ring","pin":"COM"}},{"cable":"Z endstop","color":"WH","gauge":"22 AWG","net":"Z_LIM","from":{"id":"PIBOT_ZL","type":"PiBot V4.96 Pro","subtype":"Z limit input io35 (3-pin JST-XH)","pin":"SIG"},"to":{"id":"SW_Z","type":"Endstop switch","subtype":"Z home: drill fully up","pin":"NC"}},{"cable":"Z endstop","color":"BK","gauge":"22 AWG","net":"GND","from":{"id":"PIBOT_ZL","type":"PiBot V4.96 Pro","subtype":"Z limit input io35 (3-pin JST-XH)","pin":"GND"},"to":{"id":"SW_Z","type":"Endstop switch","subtype":"Z home: drill fully up","pin":"COM"}}]},{"name":"05_drill_relay","title":"Step 5: drill on the on-board relay","wires":[{"cable":"Drill 24 V (18 AWG)","color":"RD","gauge":"18 AWG","net":"+24V","from":{"id":"WAGO+","type":"Wago 221-415 lever nut","subtype":"+24 V bus (5-way)","pin":"+24V 5"},"to":{"id":"PIBOT_RLY","type":"PiBot V4.96 Pro","subtype":"on-board relay terminal (gpio26)","pin":"COM"}},{"cable":"Drill 24 V (18 AWG)","color":"RD","gauge":"18 AWG","net":"DRILL+","from":{"id":"PIBOT_RLY","type":"PiBot V4.96 Pro","subtype":"on-board relay terminal (gpio26)","pin":"NO"},"to":{"id":"DRILL","type":"555 drill motor","subtype":"24 V, solder tabs","pin":"+ (red dot)"}},{"cable":"Drill 24 V (18 AWG)","color":"BK","gauge":"18 AWG","net":"GND","from":{"id":"WAGO-","type":"Wago 221-415 lever nut","subtype":"GND bus (5-way)","pin":"GND 5"},"to":{"id":"DRILL","type":"555 drill motor","subtype":"24 V, solder tabs","pin":"-"}},{"cable":"Diode legs","color":"SR","gauge":"22 AWG","net":"DRILL+","from":{"id":"DRILL","type":"555 drill motor","subtype":"24 V, solder tabs","pin":"+ (red dot)"},"to":{"id":"D1","type":"1N5822 diode","subtype":"flyback, solder across the drill tabs","pin":"K (stripe)"}},{"cable":"Diode legs","color":"SR","gauge":"22 AWG","net":"GND","from":{"id":"DRILL","type":"555 drill motor","subtype":"24 V, solder tabs","pin":"-"},"to":{"id":"D1","type":"1N5822 diode","subtype":"flyback, solder across the drill tabs","pin":"A"}}]}];
 
 const COLORS = {
   BK: ["#1e1f21", "Black"], RD: ["#d42a2a", "Red"], GN: ["#27a24a", "Green"], BU: ["#2563eb", "Blue"],
@@ -333,57 +347,68 @@ const NAMES = {
 const TEXT = {
   "01_power": {
     goal: "Bring 24 V from the brick through the two lever nuts to both PiBot power inputs and the DM542T.",
-    do: ["Plug the brick in on its own, set it to 24.0 V with the meter on the adapter's screw terminals, then unplug it.",
-         "The PiBot has two power inputs. Vmot-main runs the board, and Vmot-driver feeds the TMC2209 sockets. Both get 24 V.",
-         "Strip 11 mm for the lever nuts and 7 mm for screw terminals. Crimp a ferrule on every stranded wire that goes into a screw terminal.",
-         "Lever nut: lift the orange lever, push the wire in until it stops, close the lever."],
-    check: ["Plug in. The meter reads 24 V across MAIN + / MAIN −, across DRV + / DRV −, and across DM542T +VDC / GND, red probe on +.",
+    do: ["Plug the brick in on its own, set it to 24.0 V with the meter on the adapter's screw terminals, then unplug it. Never set it higher. A strip of tape over the knob stops it being bumped.",
+         "Use a barrel adapter rated 10 A that matches the brick's tip, or cut the brick's plug off and put its leads straight into the lever nuts.",
+         "The PiBot's power inputs are the orange connectors on the bottom edge. Vmot (the plug-in one) runs the board. Vmot-Driver (the screw terminal beside it) feeds the TMC2209 sockets. Both get 24 V. + and − are printed under each.",
+         "Strip 11 mm for the lever nuts. For screw terminals, crimp a ferrule on every stranded wire, stripped to the ferrule's sleeve length so no copper shows past the tip.",
+         "Lever nut: lift the orange lever, push the wire in until it stops, close the lever. One wire per slot."],
+    warn: ["\"VMOT Main\" on the black 5-pin header near the ESP32 is an output for add-on modules, not a power input. Nothing goes there."],
+    check: ["Plug in. The meter reads 24 V across Vmot + / −, across Vmot-Driver + / −, and across DM542T +VDC / GND, red probe on +.",
             "The PiBot's 5 V LED is lit and the OLED shows FluidNC.",
             "Unplug the brick."],
   },
   "02_platter": {
     goal: "Connect slot 1's green terminal to the DM542T's signal inputs, and the NEMA23 platter motor to the DM542T.",
     do: ["Set the DM542T switches 1–8 to OFF ON OFF OFF ON ON OFF ON (2.36 A, 3200 steps per turn). Check against the table printed on the driver's side.",
-         "Slot 1's routing jumpers are fitted and its StepStick socket is empty (section A).",
+         "If your DM542T has a 5V/24V signal selector (newer V4.0 drivers do), set it to 5V. It ships on 24V, and on 24V the motor doesn't move.",
+         "Slot 1's four routing jumpers are fitted and its StepStick socket is empty (section A).",
+         "Slot 1's terminal (TBX1) has no pin labels. Find its GND pin: power off, meter on continuity, one probe on Vmot −, touch each of the four screws. The one that beeps is GND. Next to it is DIR, then STP, then EN at the far end. EN stays empty.",
          "Fit a short jumper wire between PUL− and DIR−. Both go to the slot's GND. ENA+ and ENA− stay empty, so the driver is always enabled.",
-         "The DM542T's terminal order can differ from this drawing. Go by the printed labels."],
+         "The DM542T's terminal order can differ from this drawing. Go by the labels printed on the driver."],
     warn: ["Never connect or disconnect the motor while the power is on.",
            "Never put a StepStick in slot 1 while its routing jumpers are in."],
     check: ["Tug every wire. Nothing should pull out.",
-            "With the power off, the meter reads about 1 Ω between the black and green leads, and the same between red and blue. Black to red reads open.",
+            "With the power off, the meter reads about 1 Ω between the black and green leads, and the same between red and blue (touch the probes together first and subtract that reading). Black to red reads open.",
             "Bench test 2 in section C passes: X72 is one shaft turn."],
   },
   "03_arm_drill_motors": {
     goal: "Fit TMC2209s in sockets 2 and 3, then connect the threader (Y) and drill-feed (Z) pancakes to those slots' green terminals.",
-    do: ["Stick the small heatsinks onto two TMC2209 modules.",
-         "MS1 and MS2 jumpers are fitted, and slots 2 and 3 have no routing jumpers (section A).",
+    do: ["Stick the small heatsinks onto the top (label side) of two TMC2209 modules, clear of the pins.",
+         "MS1 and MS2 jumpers are on the same side as RLY, and slots 2 and 3 have no routing jumpers (section A).",
          "Push each TMC2209 into its socket with its EN pin at the socket's EN mark.",
-         "The pancake cables end in a plug. Cut it off, strip 6 mm and crimp ferrules. Land black, green, red, blue on 1A, 1B, 2A, 2B."],
-    warn: ["A driver plugged in backwards burns out as soon as the power comes on. Check the EN pin twice."],
-    check: ["With the motors unplugged, power on and measure Vref: black probe on GND, red probe on the metal top of the driver's little potentiometer. Turn it to 0.9–1.0 V. Never above 1.4 V.",
+         "The pancake cable plugs into the motor at one end. Keep that plug. Cut the plug off the other end, strip and crimp ferrules.",
+         "Meter the cut ends to find the two coils: black to blue about 3.6 Ω, green to red about 3.6 Ω, black to green open.",
+         "The terminals have no pin labels. One coil (black, blue) goes on the two screws at one end, the other coil (green, red) on the two screws at the other end. Swapping the two coils only reverses the direction."],
+    warn: ["A driver plugged in backwards burns out as soon as the power comes on. Check the EN pin twice.",
+           "Black and green are not one coil on this motor. Split coils make it buzz instead of turn."],
+    check: ["With the motors unplugged, power on and measure Vref: black probe on GND, red probe on the metal top of the driver's little potentiometer. Turn it to 0.9–1.0 V. Never above 1.4 V. Vref reads 0 V unless Vmot-Driver has 24 V.",
             "Power off, then connect both motors.",
             "Bench test 1 in section C passes: Y40 is one shaft turn."],
   },
   "04_endstops": {
     goal: "Wire one switch per axis to the X, Y and Z limit inputs so FluidNC can find home and nail 0.",
     do: ["Mount each switch where its axis homes: X at the nail-0 index, Y with the tip outside the ring, Z with the drill fully up.",
-         "Bare switch: use the C and NC tabs and leave NO empty. Read the letters moulded into the switch, because the tab order varies.",
-         "Switch on a small board with a 3-wire cable and an LED: connect only S (signal) and − (GND), and leave + empty. It then behaves as a normally-closed switch. The ? test below confirms it.",
-         "SW-VCC stays on 5V. Signal and GND only, no power wire."],
-    check: ["Power on and open the WebUI. Send ?. The status line has no Pn: entry. The limit LEDs on the PiBot are lit at rest, which is correct for normally-closed wiring.",
+         "The limit inputs are the teal 3-pin JST-XH sockets on the right edge, labelled by gpio: io33 = X, io32 = Y, io35 = Z. GND is the middle pin. To find Signal: board powered, meter on DC volts from the middle pin. The end pin that reads 5 V is SW-VCC and stays empty. The other end is Signal.",
+         "Bare switch: C to GND, NC to Signal, NO empty. Read the letters moulded into the switch, because the tab order varies.",
+         "Switch on a small board (pins S, −, +): test it first. Meter on continuity between S and −, nothing else connected. Beeps at rest and stops when you press the lever: it's normally-closed, so connect S and − only and leave + empty.",
+         "Silent at rest and beeps when pressed: it's normally-open. Connect all three (S to Signal, − to GND, + to SW-VCC) and add :low to that axis's limit pin in stringart.yaml. That works, but a broken wire then goes unnoticed.",
+         "Crimp a JST-XH 3-pin plug on each cable, with the wires in the order you found above."],
+    check: ["Power on and open the WebUI. Send ?. The status line has no Pn: entry. The PiBot's input LEDs for io33, io32 and io35 are lit at rest, which is correct.",
             "Hold a switch down and send ? again. Its letter appears, for example Pn:X, and its LED goes out.",
-            "Wiring through NC means a broken wire looks like a pressed switch, so the machine stops instead of crashing."],
+            "Wired through NC, a broken wire looks like a pressed switch, so the machine stops instead of crashing."],
   },
   "05_drill_relay": {
     goal: "Let FluidNC switch the 24 V drill motor on and off through the PiBot's own relay (gpio26).",
-    do: ["The GPIO26 function jumper is on Relay Output (factory setting, section A).",
-         "Read the rating printed on top of the relay. It needs at least 5 A at 30 V DC, and most of these relays are 10 A. If it's lower, stop and use the HiLetgo module instead.",
+    do: ["The RLY jumper is on relay (factory setting, section A).",
+         "The relay is a Hongfa JQC-3FF. Its case only prints AC ratings, but its datasheet gives 10 A at 28 V DC, which is fine for the drill.",
+         "The RELAY terminal has 3 pins and the middle one is NC. Use the two outer pins: one from +24 V, the other to the drill's + tab.",
          "Solder the diode straight across the drill's two tabs, stripe end on the + tab (the one with the red dot).",
          "Leave the bit out of the chuck until the test passes."],
     warn: ["A diode fitted backwards shorts the 24 V supply the moment the relay closes.",
-           "Use COM and NO. On NC the drill runs whenever the board is off or booting."],
+           "Never use the middle (NC) pin. On NC the drill runs whenever the board has power, and stops only during M3."],
     check: ["Power on. The drill stays still while the board boots.",
-            "Send M3 S1000. The relay clicks, its LED lights, and the drill spins after the 2 s spin-up wait. Send M5 and it stops."],
+            "Send M3 S1000. The relay clicks, its LED lights, and the drill spins after the 2 s spin-up wait. Send M5 and it stops.",
+            "If the board resets or the OLED flickers when the drill starts, the brick is dipping. Fit a 1000–2200 µF 35 V capacitor across the lever nuts (its − stripe to GND)."],
   },
 };
 
@@ -393,9 +418,9 @@ const T = (x, y, s, cls = "lbl", a = "middle") => `<text x="${x}" y="${y}" class
 
 /* vertical stack of screw terminals ("screw") or header pins ("hdr") */
 function vblock(x, y, conn, labels, o = {}) {
-  const { face = "left", kind = "screw", pitch = kind === "screw" ? 22 : 16, label = true, cls = "lbl" } = o;
+  const { face = "left", kind = "screw", pitch = kind === "screw" ? 22 : 16, label = true, cls = "lbl", body = "tb" } = o;
   const w = kind === "screw" ? 26 : 14, h = labels.length * pitch;
-  let s = `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${kind === "screw" ? 3 : 2}" class="${kind === "screw" ? "tb" : "hdr"}"/>`;
+  let s = `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${kind === "screw" ? 3 : 2}" class="${kind === "screw" ? body : "hdr"}"/>`;
   const pins = {}, keys = [];
   labels.forEach((l, i) => {
     const cy = y + pitch * i + pitch / 2, cx = x + w / 2;
@@ -464,35 +489,46 @@ const ART = {
     return { w, h, svg: s, pins, groups: [{ box: [-5, -6, w + 10, h + 12], keys }] };
   },
   pibot({ drivers = false }) {
+    // Board drawn landscape: the real board's long left edge (slot terminals) is the bottom here,
+    // its right edge (teal inputs) is the top, and its bottom edge (orange power/relay) is the right.
     const W = 560, H = 300;
     const a = { w: W, h: H, pins: {}, groups: [], svg:
       `<rect x="0" y="0" width="${W}" height="${H}" rx="10" fill="#1c3e74" stroke="#0d2242"/>
        ${[[12, 12], [W - 12, 12], [12, H - 12], [W - 12, H - 12]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="5" fill="#0d2242" stroke="#c9a85a"/>`).join("")}
-       <rect x="220" y="16" width="120" height="70" rx="3" fill="#b9bec6" stroke="#7b8088"/>
-       <rect x="232" y="26" width="96" height="40" rx="2" fill="#a7adb6"/>${T(280, 52, "ESP32", "name-d")}
-       <rect x="96" y="42" width="56" height="44" rx="3" fill="#2b74db" stroke="#16457f"/>${T(124, 68, "relay", "tiny")}
-       ${T(360, 112, "PiBot V4.96 Pro", "name", "start")}${T(360, 128, "FluidNC", "tiny", "start")}` };
+       <rect x="24" y="40" width="110" height="70" rx="3" fill="#b9bec6" stroke="#7b8088"/>
+       <rect x="34" y="50" width="90" height="40" rx="2" fill="#a7adb6"/>${T(79, 76, "ESP32", "name-d")}
+       <rect x="150" y="74" width="80" height="14" rx="2" class="hdr"/>
+       ${[0, 1, 2, 3, 4].map(i => `<rect x="${155 + 16 * i}" y="78.5" width="5" height="5" class="pin"/>`).join("")}
+       ${T(190, 68, "J3: VMOT Main is an", "tiny")}${T(190, 102, "OUTPUT, not power", "tiny")}
+       <rect x="424" y="40" width="56" height="44" rx="3" fill="#2b74db" stroke="#16457f"/>${T(452, 66, "relay", "tiny")}
+       ${T(250, 128, "PiBot V4.96 Pro", "name", "start")}${T(250, 142, "FluidNC", "tiny", "start")}` };
     const sockets = ["1 · X", "2 · Y", "3 · Z", "4", "5", "6"];
     sockets.forEach((n, i) => {
-      const x = 84 + 80 * i, y = 150, used = drivers && (i === 1 || i === 2);
-      a.svg += `<rect x="${x}" y="${y}" width="44" height="80" rx="3" fill="${used ? "#5b2d8e" : "none"}" stroke="${used ? "#2e1350" : "#5d7bb0"}" ${used ? "" : 'stroke-dasharray="4 3"'}/>`;
-      if (used) a.svg += `<rect x="${x + 8}" y="${y + 14}" width="28" height="28" rx="2" fill="#aab0b8"/><circle cx="${x + 22}" cy="${y + 62}" r="6" fill="#d0d4d9"/>${T(x + 22, y + 32, "2209", "tiny-d")}`;
-      if (i === 0) a.svg += `<rect x="${x + 6}" y="${y + 50}" width="10" height="16" rx="2" fill="#17181a"/><rect x="${x + 28}" y="${y + 50}" width="10" height="16" rx="2" fill="#17181a"/>${T(x + 22, y + 30, "empty", "tiny")}${T(x + 22, y + 44, "jumpers", "tiny")}`;
+      const x = 74 + 72 * i, y = 160, used = drivers && (i === 1 || i === 2);
+      a.svg += `<rect x="${x}" y="${y}" width="44" height="76" rx="3" fill="${used ? "#5b2d8e" : "none"}" stroke="${used ? "#2e1350" : "#5d7bb0"}" ${used ? "" : 'stroke-dasharray="4 3"'}/>`;
+      if (used) a.svg += `<rect x="${x + 8}" y="${y + 14}" width="28" height="28" rx="2" fill="#aab0b8"/><circle cx="${x + 22}" cy="${y + 60}" r="6" fill="#d0d4d9"/>${T(x + 22, y + 32, "2209", "tiny-d")}`;
+      if (i === 0) a.svg += T(x + 22, y + 36, "no", "tiny") + T(x + 22, y + 48, "driver", "tiny");
       a.svg += T(x + 22, y - 6, n, "tiny");
     });
+    // orange row (the real board's bottom edge), top to bottom: RELAY, MOSFET, Vmot, Vmot-Driver
+    a.svg += `<rect x="534" y="92" width="26" height="66" rx="3" class="ob"/>`
+      + [0, 1, 2].map(i => `<circle cx="547" cy="${103 + 22 * i}" r="7" class="screw"/>`).join("");
     merge(a,
-      vblock(0, 168, "PIBOT_PWR", ["MAIN +", "MAIN -", "DRV +", "DRV -"], { face: "left" }),
-      vblock(0, 30, "PIBOT_RLY", ["NO", "COM", "NC"], { face: "left" }),
-      hrow(360, 0, "PIBOT_XL", ["GND", "SIG"], { pitch: 24, color: "tb" }),
-      hrow(420, 0, "PIBOT_YL", ["GND", "SIG"], { pitch: 24, color: "tb" }),
-      hrow(480, 0, "PIBOT_ZL", ["GND", "SIG"], { pitch: 24, color: "tb" }),
+      vblock(534, 18, "PIBOT_RLY", ["NO", "NC", "COM"], { face: "right", body: "ob" }),
+      vblock(534, 166, "PIBOT_PWR", ["Vmot -", "Vmot +"], { face: "right", body: "ob", label: false }),
+      vblock(534, 218, "PIBOT_PWR", ["Vmot-Driver -", "Vmot-Driver +"], { face: "right", body: "ob", label: false }),
+      hrow(250, 0, "PIBOT_XL", ["SIG", "GND", "5V"], { pitch: 20, color: "xh", cls: "tiny" }),
+      hrow(326, 0, "PIBOT_YL", ["SIG", "GND", "5V"], { pitch: 20, color: "xh", cls: "tiny" }),
+      hrow(402, 0, "PIBOT_ZL", ["SIG", "GND", "5V"], { pitch: 20, color: "xh", cls: "tiny" }),
       hrow(70, 286, "PIBOT_X", ["EN", "STP", "DIR", "GND"], { face: "down", color: "tb", cls: "tiny" }),
-      hrow(150, 286, "PIBOT_YM", ["1A", "1B", "2A", "2B"], { face: "down", color: "tb", cls: "tiny" }),
-      hrow(230, 286, "PIBOT_ZM", ["1A", "1B", "2A", "2B"], { face: "down", color: "tb", cls: "tiny" }),
+      hrow(142, 286, "PIBOT_YM", ["2B", "2A", "1A", "1B"], { face: "down", color: "tb", cls: "tiny" }),
+      hrow(214, 286, "PIBOT_ZM", ["2B", "2A", "1A", "1B"], { face: "down", color: "tb", cls: "tiny" }),
     );
-    a.svg += T(24, 24, "RELAY gpio26", "tiny", "start") + T(6, 162, "24 V IN", "tiny", "start")
-      + T(384, 40, "X LIM", "tiny") + T(444, 40, "Y LIM", "tiny") + T(504, 40, "Z LIM", "tiny")
-      + T(106, 262, "SLOT 1", "tiny") + T(186, 262, "SLOT 2", "tiny") + T(266, 262, "SLOT 3", "tiny");
+    a.svg += T(526, 14, "RELAY", "tiny", "end") + T(526, 128, "MOSFET (unused)", "tiny", "end")
+      + T(527, 181, "−", "lbl", "end") + T(527, 203, "+", "lbl", "end") + T(512, 192, "VMOT", "tiny", "end")
+      + T(527, 233, "−", "lbl", "end") + T(527, 255, "+", "lbl", "end") + T(512, 244, "VMOT-DRIVER", "tiny", "end")
+      + T(280, 40, "io33 · X", "tiny") + T(356, 40, "io32 · Y", "tiny") + T(432, 40, "io35 · Z", "tiny")
+      + T(106, 262, "SLOT 1", "tiny") + T(178, 262, "SLOT 2", "tiny") + T(250, 262, "SLOT 3", "tiny");
     return a;
   },
   dm542t() {
@@ -530,7 +566,7 @@ const ART = {
        <circle cx="50" cy="64" r="22" fill="#2b2d31"/><circle cx="50" cy="64" r="5" fill="#d0d3d8"/>
        ${T(50, 108, "pancake", "tiny")}
        <rect x="28" y="0" width="44" height="14" rx="2" fill="#f1efe6" stroke="#9c998c"/>` };
-    ["A1", "A2", "B1", "B2"].forEach((p, i) => { a.pins[`${conn}:${p}`] = [33.5 + 11 * i, -1, 0, -1]; });
+    ["A+", "A-", "B+", "B-"].forEach((p, i) => { a.pins[`${conn}:${p}`] = [33.5 + 11 * i, -1, 0, -1]; });
     return a;
   },
   tmc() {
@@ -585,9 +621,9 @@ const WAGOS = (x1, y1, x2, y2) => [
 const LAYOUT = {
   "01_power": { w: 1100, h: 560, items: [
     { art: "psu", x: 30, y: 390, cap: "Power brick", sub: "unplugged while wiring" },
-    { art: "pibot", x: 260, y: 30 },
+    { art: "pibot", x: 120, y: 30 },
     { art: "dm542t", x: 900, y: 140 },
-    ...WAGOS(300, 470, 470, 470),
+    ...WAGOS(560, 470, 730, 470),
   ] },
   "02_platter": { w: 1100, h: 560, items: [
     { art: "pibot", x: 40, y: 40 },
@@ -596,8 +632,8 @@ const LAYOUT = {
   ] },
   "03_arm_drill_motors": { w: 1100, h: 610, items: [
     { art: "pibot", x: 40, y: 30, o: { drivers: true } },
-    { art: "nema17", x: 120, y: 470, o: { conn: "NEMA17_Y" }, cap: "Threader motor (Y)" },
-    { art: "nema17", x: 340, y: 470, o: { conn: "NEMA17_Z" }, cap: "Drill-feed motor (Z)" },
+    { art: "nema17", x: 120, y: 470, o: { conn: "NEMA17_Y" }, cap: "Threader motor (Y)", sub: "coils: black–blue, green–red" },
+    { art: "nema17", x: 340, y: 470, o: { conn: "NEMA17_Z" }, cap: "Drill-feed motor (Z)", sub: "coils: black–blue, green–red" },
     { art: "tmc", x: 760, y: 90, cap: "TMC2209, pin side up", sub: "EN pin (circled) goes to the socket's EN mark" },
   ] },
   "04_endstops": { w: 1100, h: 520, items: [
@@ -606,11 +642,11 @@ const LAYOUT = {
     { art: "endstop", x: 760, y: 70, o: { conn: "SW_Z" }, capAbove: "Z home", sub: "drill fully up" },
     { art: "pibot", x: 260, y: 200 },
   ] },
-  "05_drill_relay": { w: 1300, h: 500, items: [
-    { art: "drill", x: 30, y: 60, cap: "555 drill motor", sub: "+ tab has the red dot" },
-    { art: "diode", x: 210, y: 150, cap: "1N5822 diode", sub: "across the drill tabs" },
-    { art: "pibot", x: 700, y: 60 },
-    ...WAGOS(300, 400, 470, 400),
+  "05_drill_relay": { w: 1300, h: 540, items: [
+    { art: "pibot", x: 40, y: 60 },
+    { art: "drill", x: 780, y: 270, cap: "555 drill motor", sub: "+ tab has the red dot" },
+    { art: "diode", x: 1120, y: 360, cap: "1N5822 diode", sub: "across the drill tabs" },
+    ...WAGOS(590, 440, 860, 440),
   ] },
 };
 

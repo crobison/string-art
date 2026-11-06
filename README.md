@@ -53,8 +53,11 @@ time and is cached; solving 4000 lines takes ~2 s.
 
 ```
 .venv/bin/python machine/post.py generator/out/lincoln.json -o lincoln.gcode
-.venv/bin/python machine/post.py generator/out/lincoln.json --drill -o lincoln_drill.gcode
+.venv/bin/python machine/post.py generator/out/lincoln.json --drill --z-surface -18.5 -o lincoln_drill.gcode
 ```
+
+`--z-surface` is the machine Z where the drill bit just touches the board: home, jog Z down to the board and
+read MPos Z in the WebUI. Z homes up to 0, so it is negative. `--z-safe` and `--z-depth` are measured from the surface.
 
 The nail count is read from the JSON. On the controller side the only value tied to the nail
 count is X `steps_per_mm` (steps per nail) in `machine/fluidnc-config.yaml`.

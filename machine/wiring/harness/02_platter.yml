@@ -16,7 +16,9 @@ connectors:
     - GND
     hide_disconnected_pins: true
     show_name: false
-    notes: Slot 1's StepStick socket stays EMPTY. Match the silkscreen names.
+    notes: 'Slot 1''s StepStick socket stays EMPTY. The terminal has no pin labels:
+
+      find GND with a continuity beep to Vmot -, then DIR, STP, EN follow.'
   DM542T_SIG:
     type: DM542T
     subtype: signal terminal
@@ -34,7 +36,9 @@ connectors:
       - 4
     notes: 'Short jumper PUL- to DIR-. ENA+ and ENA- stay empty.
 
-      DIP switches 1-8: OFF ON OFF OFF ON ON OFF ON.'
+      DIP switches 1-8: OFF ON OFF OFF ON ON OFF ON.
+
+      5V/24V signal selector (newer drivers): 5V.'
   NEMA23:
     type: NEMA23 23HS45-4204S
     subtype: platter motor (X), 4 flying leads

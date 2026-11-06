@@ -8,7 +8,7 @@ options:
 connectors:
   PSU:
     type: 24 V power brick
-    subtype: barrel-to-screw adapter
+    subtype: barrel adapter rated 10 A, or bare leads
     pinlabels:
     - +
     - '-'
@@ -17,7 +17,7 @@ connectors:
     pincolors:
     - RD
     - BK
-    notes: Set the brick to 24 V and check with a meter BEFORE connecting anything.
+    notes: Set the brick to 24.0 V (never higher) with a meter BEFORE connecting anything.
   WAGO+:
     type: Wago 221-415 lever nut
     subtype: +24 V bus (5-way)
@@ -56,17 +56,19 @@ connectors:
     notes: All 5 slots are the same point.
   PIBOT_PWR:
     type: PiBot V4.96 Pro
-    subtype: Vmot-main and Vmot-driver inputs
+    subtype: orange power inputs, bottom edge
     pinlabels:
-    - MAIN +
-    - MAIN -
-    - DRV +
-    - DRV -
+    - Vmot +
+    - Vmot -
+    - Vmot-Driver +
+    - Vmot-Driver -
     hide_disconnected_pins: true
     show_name: false
-    notes: 'Vmot-main powers the board, Vmot-driver powers the socket drivers.
+    notes: 'Vmot (orange plug, CN3) powers the board. Vmot-Driver (CN4) powers the
 
-      Both need 24 V. Check the + / - marking beside each terminal.'
+      socket drivers. Both need 24 V. + and - are printed under each.
+
+      "VMOT Main" on the black 5-pin header is an output: nothing goes there.'
   DM542T_HV:
     type: DM542T
     subtype: power + motor terminal
@@ -88,14 +90,14 @@ cables:
     colors:
     - RD
     - BK
-  PiBot Vmot-main:
+  PiBot Vmot:
     category: bundle
     gauge: 18 AWG
     show_equiv: false
     colors:
     - RD
     - BK
-  PiBot Vmot-driver:
+  PiBot Vmot-Driver:
     category: bundle
     gauge: 18 AWG
     show_equiv: false
@@ -124,28 +126,28 @@ connections:
     - GND 1
 - - WAGO+:
     - +24V 2
-  - PiBot Vmot-main:
+  - PiBot Vmot:
     - 1
   - PIBOT_PWR:
-    - MAIN +
+    - Vmot +
 - - WAGO-:
     - GND 2
-  - PiBot Vmot-main:
+  - PiBot Vmot:
     - 2
   - PIBOT_PWR:
-    - MAIN -
+    - Vmot -
 - - WAGO+:
     - +24V 3
-  - PiBot Vmot-driver:
+  - PiBot Vmot-Driver:
     - 1
   - PIBOT_PWR:
-    - DRV +
+    - Vmot-Driver +
 - - WAGO-:
     - GND 3
-  - PiBot Vmot-driver:
+  - PiBot Vmot-Driver:
     - 2
   - PIBOT_PWR:
-    - DRV -
+    - Vmot-Driver -
 - - WAGO+:
     - +24V 4
   - DM542T power:

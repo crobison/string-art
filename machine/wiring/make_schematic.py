@@ -60,16 +60,16 @@ BLOCKS = [
 
     dict(ref="U1", sym="PIBOT_V496", value="PiBot V4.96 Pro (ESP32, FluidNC)",
          at=(180.34, 50.8), w=50.8,
-         left=["Vmot-main (board) 24 V",
+         left=["CN3 Vmot (main)",
                ("VMAIN+", "+24V"), ("VMAIN-", "GND"),
-               "Vmot-driver (sockets) 24 V",
+               "CN4 Vmot-Driver",
                ("VDRV+", "+24V"), ("VDRV-", "GND"),
-               None, "Limit inputs (SW-VCC 5V)",
+               None, "Limit inputs, JST-XH (SW-VCC 5V)",
                ("X_LIM/gpio33", "X_LIM"), ("Y_LIM/gpio32", "Y_LIM"),
-               ("Z_LIM/gpio35", "Z_LIM"), ("LIM_GND", "GND"),
-               None, "On-board relay (gpio26)",
-               ("RLY_COM", "+24V"), ("RLY_NO", "DRILL+"), ("RLY_NC", None)],
-         right=["Slot 1 terminal (routing jumpers IN)",
+               ("Z_LIM/gpio35", "Z_LIM"), ("LIM_GND", "GND"), ("SW_VCC", None),
+               None, "CN1 relay (gpio26)",
+               ("RLY_COM", "+24V"), ("RLY_NC", None), ("RLY_NO", "DRILL+")],
+         right=["TBX1 slot 1 (jumpers in)",
                 ("EN/I2SO.0", None), ("STP/I2SO.2", "X_STEP"),
                 ("DIR/I2SO.1", "X_DIR"), ("S1_GND", "GND"),
                 None, "Socket 2 (Y) signals",
@@ -98,7 +98,7 @@ BLOCKS = [
                 ("1A", "Y_A1"), ("1B", "Y_A2"), ("2A", "Y_B1"), ("2B", "Y_B2")]),
     dict(ref="M2", sym="NEMA17", value="17HE08-1004S threader (Y)",
          at=(363.22, 109.22), w=15.24, motor=True,
-         left=[("A1/blk", "Y_A1"), ("A2/grn", "Y_A2"), ("B1/red", "Y_B1"), ("B2/blu", "Y_B2")],
+         left=[("A+/blk", "Y_A1"), ("A-/blu", "Y_A2"), ("B+/grn", "Y_B1"), ("B-/red", "Y_B2")],
          right=[]),
 
     dict(ref="U4", sym="TMC2209", value="TMC2209 in socket 3 (Z), Vref 0.9-1.0 V",
@@ -109,7 +109,7 @@ BLOCKS = [
                 ("1A", "Z_A1"), ("1B", "Z_A2"), ("2A", "Z_B1"), ("2B", "Z_B2")]),
     dict(ref="M3", sym="NEMA17", value="17HE08-1004S drill Z",
          at=(363.22, 170.18), w=15.24, motor=True,
-         left=[("A1/blk", "Z_A1"), ("A2/grn", "Z_A2"), ("B1/red", "Z_B1"), ("B2/blu", "Z_B2")],
+         left=[("A+/blk", "Z_A1"), ("A-/blu", "Z_A2"), ("B+/grn", "Z_B1"), ("B-/red", "Z_B2")],
          right=[]),
 
     dict(ref="SW1", sym="ENDSTOP", value="X index (nail 0)",
@@ -124,20 +124,22 @@ BLOCKS = [
 ]
 
 NOTES = """NOTES
-1. Pins follow the PiBot V4.96 Pro factory YAML (wiki.pibot.com, checked 2026-11-04) and
-   ../fluidnc-config.yaml. Steppers are on the I2S shift register (I2SO.n). gpio2 is the probe INPUT.
-2. Board jumpers: VDD = 5V, SW-VCC = 5V, GPIO26 = Relay Output, USB-5V removed, SPI removed,
-   MS1 + MS2 fitted (1/16), RST/SLP off. Slot 1 routing jumpers IN and its socket EMPTY;
-   slots 2-6 routing jumpers OUT. A driver in a jumpered slot destroys the driver and the board.
-3. Power: 24 V to BOTH Vmot-main (board) and Vmot-driver (socket drivers), plus the DM542T VDC.
-   Recommended: inline 5-6 A fuse after J1. Never unplug a motor with power on.
-4. DM542T common cathode: STP to PUL+, DIR to DIR+, slot GND to PUL- and DIR-, ENA open.
-   DIP SW1-3 = OFF ON OFF (2.36 A RMS), SW4 OFF, SW5-8 = ON ON OFF ON (3200 pulses/rev).
-5. TMC2209 standalone, 1/16: MS1 = MS2 = HIGH via the shared MS caps. Vref 0.9-1.0 V, max 1.4 V.
-6. Endstops COM to GND, NC to the input: closed at rest, opens when hit or if a wire breaks;
+1. Pins follow the PiBot V4.96 Pro factory YAML and schematic (sch496, 2025-10-24), checked
+   2026-11-05, and ../fluidnc-config.yaml. Steppers are on the I2S shift register (I2SO.n).
+2. Jumpers, 9 in total: VDD on 5V, SW-VCC on 5V, RLY (GPIO26) on relay, MS1 + MS2 on the VDD
+   side (1/16), slot 1 routing x4. USB-5V, RST, SLP, NULL, SPI and slots 2-6 routing: none.
+   Slot 1's StepStick socket stays EMPTY: a driver in a jumpered slot destroys it and the board.
+3. Power, brick at 24.0 V max: CN3 "Vmot" (orange plug, main) and CN4 "Vmot-Driver" (sockets)
+   both from the lever nuts, plus the DM542T VDC. "VMOT Main" on header J3 is an OUTPUT.
+4. DM542T common cathode: STP to PUL+, DIR to DIR+, GND to PUL- and DIR-, ENA open. 5V/24V
+   selector (V4.0) on 5V. DIP SW1-3 OFF ON OFF (2.36 A RMS), SW4 OFF, SW5-8 ON ON OFF ON (3200).
+5. TBX1 has no pin labels. Pin 1-4 with routing jumpers in: EN, STP, DIR, GND.
+   TBY2/TBZ3 pin 1-4 = 2B, 2A, 1A, 1B: each coil on two neighbouring screws.
+6. TMC2209 standalone, 1/16: MS1 = MS2 = HIGH. Vref 0.9-1.0 V, max 1.4 V (needs CN4 powered).
+7. Endstops COM to GND, NC to Signal: closed at rest, opens when hit or if a wire breaks;
    config pins have no :low. Input LEDs are lit at rest and go out when a switch is pressed.
-7. Drill through the on-board relay: COM from +24 V, NO to DRILL+. D1 across the drill, stripe to +.
-8. Coil pairs: black/green = A (1A/1B), red/blue = B (2A/2B). Swap one pair to reverse an axis."""
+8. Relay CN1: pin 1 COM, pin 2 NC (unused), pin 3 NO. D1 across the drill, stripe to +.
+9. Pancake 17HE08-1004S coils: black/blue = A, green/red = B. NEMA23: black/green, red/blue."""
 
 
 def sides(b):

@@ -4,16 +4,17 @@
 #
 # Pins follow the PiBot V4.96 Pro factory test YAML and wiki (checked 2026-11-04):
 #   https://wiki.pibot.com/doku.php?id=pibot_cnc_laser_series:v496_pro:docs:xyzabc-drv8825-config
-#   Steppers come out of an I2S shift register (I2SO.n), not plain gpios.
+#   Steppers come out of an I2S shift register (I2SO.n), not plain gpios. I2SO.6 and I2SO.11 drive
+#   the MS3 position of sockets 2 and 3 (PDN_UART on a TMC2209): left low, never reuse them.
 #   Slot 1 (X)  STEP I2SO.2  DIR I2SO.1  EN I2SO.0   limit gpio.33
 #   Slot 2 (Y)  STEP I2SO.5  DIR I2SO.4  EN I2SO.7   limit gpio.32
 #   Slot 3 (Z)  STEP I2SO.10 DIR I2SO.9  EN I2SO.8   limit gpio.35
 #   On-board relay gpio.26 (GPIO26 function jumper on "Relay Output").  gpio.2 is the probe INPUT.
 #
 # Board jumpers for this config (see the wiring guide, "Board setup"):
-#   VDD = 5V, SW-VCC = 5V, GPIO26 = Relay Output, USB-5V jumper removed, SPI jumpers removed,
-#   slot 1 routing jumpers IN with its StepStick socket EMPTY, slots 2-3 routing jumpers OUT,
-#   MS1 and MS2 caps fitted (1/16 for the TMC2209s), RST/SLP caps off.
+#   9 jumpers: VDD on +5V, SW-VCC on +5V, RLY (GPIO26) on relay, slot 1 routing x4 with its
+#   StepStick socket EMPTY, MS1 and MS2 on the VDD side (same side as RLY: 1/16 for the TMC2209s).
+#   None on USB-5V, NULL, RST, SLP, SPI or the routing headers of slots 2-6.
 #
 # Axes:
 #   X = platter rotation, in NAIL UNITS.  steps_per_mm is really steps per nail.
@@ -32,7 +33,7 @@ stepping:
   engine: I2S_STREAM
   idle_ms: 255          # 255 = never disable: keeps the platter energised between moves
   pulse_us: 4           # DM542T needs >= 2.5 us
-  dir_delay_us: 5       # DM542T wants DIR settled 5 us before the step edge
+  dir_delay_us: 8       # DM542T wants DIR settled >= 5 us before the step edge; margin for the I2S engine
   disable_delay_us: 0
 
 axes:
@@ -43,10 +44,12 @@ axes:
   #    SW1 OFF  SW2 ON  SW3 OFF -> 3.31 A peak / 2.36 A RMS
   #    SW4 OFF                  -> half current at standstill
   #    SW5 ON   SW6 ON  SW7 OFF  SW8 ON -> 3200 pulses/rev
+  #  Newer DM542T (V4.0) have a 5V/24V signal selector, factory 24V: set it to 5V or nothing moves.
+  #  Slot 1's terminal has no pin labels: pin 1-4 = EN, STP, DIR, GND (GND beeps to Vmot -).
   #  Signals (common cathode, the PiBot terminal sources 5 V):
   #    STP -> PUL+, DIR -> DIR+, GND -> PUL- and DIR-.  ENA+/ENA- unconnected (always enabled).
   x:
-    steps_per_mm: 44.444        # steps PER NAIL: 3200 * 4 / 288
+    steps_per_mm: 44.44444      # steps PER NAIL: 3200 * 4 / 288 (keep the digits: X never wraps)
     max_rate_mm_per_min: 2000   # nails per minute; raise once it runs clean
     acceleration_mm_per_sec2: 30
     max_travel_mm: 100000       # effectively unlimited: X unwraps as the platter turns
@@ -61,17 +64,19 @@ axes:
       seek_scaler: 1.1
       feed_scaler: 1.1
     motor0:
-      limit_neg_pin: gpio.33     # X limit terminal: index switch at nail 0, wired NC (no :low)
+      limit_neg_pin: gpio.33     # X limit (JST-XH io33): index switch at nail 0, wired NC (no :low)
       hard_limits: false
-      pulloff_mm: 1.0
+      pulloff_mm: 0.4            # nail units: X=0 sits 0.4 nail past the switch trip point
       standard_stepper:
         step_pin: I2SO.2
         direction_pin: I2SO.1    # wrong way round? use I2SO.1:low
         disable_pin: I2SO.0      # not wired to the DM542T; drives the slot's EN LED only
 
   # ---- Threader: 17HE08-1004S pancake on a TMC2209 in socket 2, standalone step/dir.
-  #  Vref 0.9-1.0 V (~0.65-0.7 A RMS). MS1+MS2 caps fitted = 1/16.  No ms3_pin: on the TMC2209
-  #  that socket position is PDN_UART, and leaving it low keeps normal operation.
+  #  Vref 0.9-1.0 V (~0.65-0.7 A RMS), needs 24 V on Vmot-Driver to read. MS1+MS2 jumpers on the
+  #  VDD side = 1/16.  No ms3_pin: that socket position is PDN_UART (I2SO.6 / I2SO.11); low keeps
+  #  standalone mode with automatic current reduction at standstill.
+  #  Coils on the 17HE08-1004S: black/blue and green/red, each on two neighbouring terminal screws.
   y:
     steps_per_mm: 80            # GT2 20T pulley (40 mm/rev) at 16 microsteps: 3200 / 40
     max_rate_mm_per_min: 4000
@@ -88,7 +93,7 @@ axes:
       seek_scaler: 1.1
       feed_scaler: 1.1
     motor0:
-      limit_neg_pin: gpio.32     # Y limit terminal, wired NC
+      limit_neg_pin: gpio.32     # Y limit (JST-XH io32), wired NC. Normally-open module? add :low
       hard_limits: false
       pulloff_mm: 1.0
       stepstick:
@@ -96,7 +101,9 @@ axes:
         direction_pin: I2SO.4
         disable_pin: I2SO.7
 
-  # ---- Drill feed: 17HE08-1004S on a TMC2209 in socket 3, T8 lead screw. Homes UP.
+  # ---- Drill feed: 17HE08-1004S on a TMC2209 in socket 3, T8 lead screw. Homes UP to Z=0, so
+  #  machine Z runs 0 down to -max_travel; post.py --drill sets work Z0 at the board surface.
+  #  400 steps/mm assumes an 8 mm lead (T8x8). A T8x2 screw needs 1600.
   z:
     steps_per_mm: 400           # 8 mm lead at 16 microsteps: 3200 / 8
     max_rate_mm_per_min: 1500
@@ -113,7 +120,7 @@ axes:
       seek_scaler: 1.1
       feed_scaler: 1.1
     motor0:
-      limit_pos_pin: gpio.35     # Z limit terminal, wired NC
+      limit_pos_pin: gpio.35     # Z limit (JST-XH io35), wired NC. Normally-open module? add :low
       hard_limits: false
       pulloff_mm: 1.0
       stepstick:
@@ -125,6 +132,7 @@ i2so:
   bck_pin: gpio.22
   data_pin: gpio.21
   ws_pin: gpio.17
+  min_pulse_us: 4       # 4 us I2S frames: longer DIR-before-STEP lead for the DM542T
 
 spi:
   miso_pin: gpio.19
@@ -156,7 +164,6 @@ relay:
   spinup_ms: 2000
   spindown_ms: 1000
   tool_num: 0
-  speed_map: 0=0.000% 0=100.000% 1=100.000%
   off_on_alarm: true
 
 start:

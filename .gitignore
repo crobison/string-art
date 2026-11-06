@@ -4,3 +4,4 @@ generator/out/
 *.pyc
 ~*.lck
 *.kicad_prl
+corpus-input/

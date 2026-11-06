@@ -8,12 +8,15 @@ options:
 connectors:
   PIBOT_XL:
     type: PiBot V4.96 Pro
-    subtype: X limit input (gpio33)
+    subtype: X limit input io33 (3-pin JST-XH)
     pinlabels:
-    - GND
     - SIG
+    - GND
+    - 5V
     hide_disconnected_pins: true
     show_name: false
+    notes: 'GND is the middle pin. The end pin that reads 5 V is SW-VCC: leave it
+      empty.'
   SW_X:
     type: Endstop switch
     subtype: 'X index: fires at nail 0'
@@ -26,12 +29,15 @@ connectors:
     notes: Tabs are marked C, NC, NO. Leave NO empty.
   PIBOT_YL:
     type: PiBot V4.96 Pro
-    subtype: Y limit input (gpio32)
+    subtype: Y limit input io32 (3-pin JST-XH)
     pinlabels:
-    - GND
     - SIG
+    - GND
+    - 5V
     hide_disconnected_pins: true
     show_name: false
+    notes: 'GND is the middle pin. The end pin that reads 5 V is SW-VCC: leave it
+      empty.'
   SW_Y:
     type: Endstop switch
     subtype: 'Y home: tip outside the ring'
@@ -44,12 +50,15 @@ connectors:
     notes: Tabs are marked C, NC, NO. Leave NO empty.
   PIBOT_ZL:
     type: PiBot V4.96 Pro
-    subtype: Z limit input (gpio35)
+    subtype: Z limit input io35 (3-pin JST-XH)
     pinlabels:
-    - GND
     - SIG
+    - GND
+    - 5V
     hide_disconnected_pins: true
     show_name: false
+    notes: 'GND is the middle pin. The end pin that reads 5 V is SW-VCC: leave it
+      empty.'
   SW_Z:
     type: Endstop switch
     subtype: 'Z home: drill fully up'
@@ -66,56 +75,56 @@ cables:
     gauge: 22 AWG
     show_equiv: false
     colors:
-    - BK
     - WH
+    - BK
   Y endstop:
     category: bundle
     gauge: 22 AWG
     show_equiv: false
     colors:
-    - BK
     - WH
+    - BK
   Z endstop:
     category: bundle
     gauge: 22 AWG
     show_equiv: false
     colors:
-    - BK
     - WH
+    - BK
 connections:
 - - PIBOT_XL:
-    - GND
+    - SIG
   - X endstop:
     - 1
   - SW_X:
-    - COM
+    - NC
 - - PIBOT_XL:
-    - SIG
+    - GND
   - X endstop:
     - 2
   - SW_X:
-    - NC
-- - PIBOT_YL:
-    - GND
-  - Y endstop:
-    - 1
-  - SW_Y:
     - COM
 - - PIBOT_YL:
     - SIG
   - Y endstop:
-    - 2
+    - 1
   - SW_Y:
     - NC
-- - PIBOT_ZL:
+- - PIBOT_YL:
     - GND
-  - Z endstop:
-    - 1
-  - SW_Z:
+  - Y endstop:
+    - 2
+  - SW_Y:
     - COM
 - - PIBOT_ZL:
     - SIG
   - Z endstop:
-    - 2
+    - 1
   - SW_Z:
     - NC
+- - PIBOT_ZL:
+    - GND
+  - Z endstop:
+    - 2
+  - SW_Z:
+    - COM
