@@ -180,13 +180,13 @@ footer { margin-top: 72px; padding-top: 20px; border-top: 1px solid var(--line);
       <div class="call do"><h4>Do first</h4><ol>
         <li>Board unpowered, USB unplugged, nothing on any terminal.</li>
         <li>Screw on the Wi-Fi antenna. Without it there is no Wi-Fi. Plug in the OLED. A TF card is optional.</li>
-        <li>Use tweezers or pliers for the caps. Fit or remove each one, then check it against the table again.</li>
+        <li>Use tweezers or pliers for the jumpers (the small plastic caps that bridge two pins). Fit or remove each one, then check it against the table again.</li>
       </ol></div>
       <div class="call warn"><h4>Careful</h4><ol>
         <li>Each of the six driver slots has a <b>StepStick socket</b>: two rows of 8 female header pins that a plug-in driver board pushes into. Your TMC2209s are StepSticks, and they go in the sockets of slots 2 and 3.</li>
         <li>Slot 1 (X on the silkscreen) is different. The DM542T is an external driver and doesn't plug in. Fit all four of slot 1's routing jumpers (STP, DIR, EN, GND), and <b>leave slot 1's socket empty</b>.</li>
         <li>Never put a TMC2209 in slot 1. With the routing jumpers in, its 24 V motor outputs land on the board's logic lines. That destroys the driver and the board's chips.</li>
-        <li>The board ships with only three caps fitted (VDD, SW-VCC, GPIO26). Every other cap in this table is one you add.</li>
+        <li>The board ships with only three jumpers fitted (VDD, SW-VCC, GPIO26). Every other jumper in this table is one you add.</li>
       </ol></div>
     </div>
     <div class="table-wrap"><table class="jt">
@@ -204,7 +204,7 @@ footer { margin-top: 72px; padding-top: 20px; border-top: 1px solid var(--line);
       </tbody>
     </table></div>
     <div class="call check"><h4>Check before moving on</h4><ol>
-      <li>Count the jumpers (caps): <b>9 on the board in total</b>, whatever the board shipped with. VDD on 5V (1), SW-VCC on 5V (1), GPIO26 on Relay (1), slot 1 routing STP, DIR, EN and GND (4), MS1 and MS2 (2). USB-5V has no jumper. Slots 2–6 have no routing jumpers. No jumpers on RST/SLP or SPI.</li>
+      <li>Count the jumpers: <b>9 on the board in total</b>, whatever the board shipped with. VDD on 5V (1), SW-VCC on 5V (1), GPIO26 on Relay (1), slot 1 routing STP, DIR, EN and GND (4), MS1 and MS2 (2). USB-5V has no jumper. Slots 2–6 have no routing jumpers. No jumpers on RST/SLP or SPI.</li>
       <li>If your count isn't 9, compare each row of the table above with the board until it is. Spare jumpers go in a bag, not on unused pins.</li>
       <li>Optional meter check once the board has 24 V (section B): socket 2's MS1 and MS2 pins read about 5 V to GND. The bench test in section C proves this anyway.</li>
     </ol></div>
@@ -268,8 +268,8 @@ $CD                        (prints the config it actually loaded)</pre>
       <thead><tr><th>You see</th><th>Cause</th><th>Fix</th></tr></thead>
       <tbody>
         <tr><td>Exactly one turn</td><td>Everything is right</td><td>Move on</td></tr>
-        <tr><td>Pancake turns twice</td><td>TMC2209 at 1/8: the MS caps aren't pulling high</td><td>Check MS1/MS2 caps and that VDD is on 5V</td></tr>
-        <tr><td>Pancake turns ½ or ¼ turn</td><td>TMC2209 at 1/32 or 1/64: only one MS cap is working</td><td>Re-seat both MS caps</td></tr>
+        <tr><td>Pancake turns twice</td><td>TMC2209 at 1/8: the MS jumpers aren't pulling high</td><td>Check MS1/MS2 jumpers and that VDD is on 5V</td></tr>
+        <tr><td>Pancake turns ½ or ¼ turn</td><td>TMC2209 at 1/32 or 1/64: only one MS jumper is working</td><td>Re-seat both MS jumpers</td></tr>
         <tr><td>NEMA23 turns half a turn</td><td>DM542T at 6400</td><td>SW5–8 = ON ON OFF ON</td></tr>
         <tr><td>NEMA23 turns twice</td><td>DM542T at 1600 (SW5–8 = OFF OFF ON ON)</td><td>SW5–8 = ON ON OFF ON</td></tr>
         <tr><td>Motor buzzes or jitters but doesn't turn</td><td>A coil pair is split across A and B</td><td>Power off. Find the pairs with the meter (a few Ω between the two wires of one coil) and re-land them</td></tr>
@@ -356,7 +356,7 @@ const TEXT = {
   "03_arm_drill_motors": {
     goal: "Fit TMC2209s in sockets 2 and 3, then connect the threader (Y) and drill-feed (Z) pancakes to those slots' green terminals.",
     do: ["Stick the small heatsinks onto two TMC2209 modules.",
-         "MS1 and MS2 caps are fitted, and slots 2 and 3 have no routing jumpers (section A).",
+         "MS1 and MS2 jumpers are fitted, and slots 2 and 3 have no routing jumpers (section A).",
          "Push each TMC2209 into its socket with its EN pin at the socket's EN mark.",
          "The pancake cables end in a plug. Cut it off, strip 6 mm and crimp ferrules. Land black, green, red, blue on 1A, 1B, 2A, 2B."],
     warn: ["A driver plugged in backwards burns out as soon as the power comes on. Check the EN pin twice."],
