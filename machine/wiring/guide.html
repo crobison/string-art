@@ -276,6 +276,7 @@ $CD                        (prints the config it actually loaded)</pre>
         <li>Brick unplugged. Wire step 1's DM542T pair and all of step 2, with the DIP switches set and the DM542T's 5V/24V selector (if it has one) on <b>5V</b>.</li>
         <li>Power on. The DM542T's green LED lights, and the red one stays off.</li>
         <li>Send <code>$J=G91 X72 F600</code>: the NEMA23 shaft turns <b>exactly once</b> in about 7.5 s. (72 nails × 44.444 = 3200 steps.) <code>$J=G91 X-72 F600</code> brings it back.</li>
+        <li>With the belt and platter fitted, upload and run <code>machine/platter-test.gcode</code> (about 6 min). It runs half turns at rising speeds, full-speed turns and a threading pattern, and stops for 5 s after each part so you can check that a mark on the rim still lines up with a fixed pointer. If it drifts or sounds rough, lower <code>max_rate_mm_per_min</code> or <code>acceleration_mm_per_sec2</code> on X.</li>
       </ol></div>
     </div>
     <div class="table-wrap"><table class="jt">

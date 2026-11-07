@@ -122,7 +122,7 @@ rock it against the hub bearings.
 | Centre distance | (L − π(45.8 + 11.5)/2) / 2 ≈ (L − 90)/2 for a belt of length L; a 400 mm belt gives 155 mm |
 | Motor mount | NEMA23 standing on a 12 mm plywood riser with 4 slotted holes radial to the hub, so the whole motor slides to tension the belt. Your printed tensioner idler goes on the slack span. |
 | Backlash | GT2 backlash of ~0.1 mm at the belt is 0.1 / 22.9 = 0.25° at the platter, or 1.3 mm at the ring. Because the tip never has to hit the gap between nails (section 8), this only matters for the ±0.5 nail sweep, which has 3 mm of margin either way. |
-| Torque | 3 N·m at the motor (2.4 N·m at the 3.31 A setting) × 4 = ~9 N·m at the platter. The platter's inertia is 0.1 kg·m². You are limited by belt tension, not torque. Raise the X acceleration in the config from 30 to 300 nails/s² once the machine runs. |
+| Torque | 3 N·m at the motor (2.4 N·m at the 3.31 A setting) × 4 = ~9 N·m at the platter. The platter's inertia is 0.1 kg·m². Torque is not the limit: even a 7 kg platter (0.3 kg·m²) needs only ~0.04 N·m at the motor at the config's 25 nails/s². The config keeps X gentle (1500 nails/min, 25 nails/s², about a 1 s ramp) to spare the belt, the hub and the thread and to let the platter settle before each wrap. Raise it in small steps only after `platter-test.gcode` passes. |
 
 ## 6. Base
 
@@ -203,10 +203,11 @@ sync with the G-code.
 
 ### Timing
 
-Per nail: two 35 mm arm moves at 4000 mm/min ≈ 1.2 s, the 1-nail sweep ≈ 0.3 s, and the index
-move, averaging a quarter turn = 72 nails, ≈ 2.5 s at 2000 nails/min. About **4 s per line,
-4.5 h for 4000 lines**. Raising X to 4000 nails/min and 300 nails/s² acceleration roughly halves
-that once the belt is proven.
+Per nail: two 35 mm arm moves at 4000 mm/min ≈ 1.5 s, the 1-nail sweep ≈ 0.4 s, and the index
+move, averaging a quarter turn = 72 nails, ≈ 3.9 s at 1500 nails/min with a 1 s ramp
+(25 nails/s²). About **6 s per line, 6.4 h for 4000 lines**. This is deliberately slow for a
+heavy platter. 2000 nails/min at 30 nails/s² gives 5.7 h; raising X further saves less time
+than it seems, because most of each line is spent ramping and on the arm moves.
 
 ## 9. Thread path and tension
 

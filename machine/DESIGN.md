@@ -89,7 +89,7 @@ PSU, HiLetgo relay 2-pack, 6-pack endstops, 555 drill kit.
 | NEMA17 at 1/16, direct | 0.1125°/step |
 | with 6:1 | 0.019°/step, 66.7 steps per nail |
 | Printed gear backlash | 0.2–0.5°, so always approach from the same direction or use a belt |
-| Typical portrait | 3000–4000 lines, 1.5–2.2 km thread, 40–90 min machine time at 3 s per line |
+| Typical portrait | 3000–4000 lines, 1.5–2.2 km thread, about 6.4 h machine time for 4000 lines at ~6 s per line (gentle X settings; see PLATTER.md) |
 
 ## Lessons from other builds (worth reading before cutting anything)
 

@@ -2,6 +2,7 @@
 # no soft limits and no must_home, so you can jog a motor before any switch is wired.
 # Upload as bench.yaml, run  $Config/Filename=bench.yaml  and restart. Switch to stringart.yaml after.
 #   $J=G91 X72 F600   -> exactly one NEMA23 shaft turn (72 x 44.444 = 3200 steps)
+#   Then run platter-test.gcode (speed ladder, ramp and return-to-mark check).
 #   $J=G91 Y40 F600   -> exactly one pancake shaft turn on Y (40 x 80 = 3200 steps)
 #   $J=G91 Z8 F300    -> exactly one pancake shaft turn on Z (8 x 400 = 3200 steps)
 # One turn per command proves the microstep setting as well as the wiring.
@@ -31,8 +32,16 @@ axes:
   #    STP -> PUL+, DIR -> DIR+, GND -> PUL- and DIR-.  ENA+/ENA- unconnected (always enabled).
   x:
     steps_per_mm: 44.44444      # steps PER NAIL: 3200 * 4 / 288 (keep the digits: X never wraps)
-    max_rate_mm_per_min: 2000   # nails per minute; raise once it runs clean
-    acceleration_mm_per_sec2: 30
+    # Speed and ramp, in nails (288 per platter turn). Chosen gentle on purpose: the platter is
+    # heavy and accuracy matters more than run time. FluidNC ramps at constant acceleration
+    # (no S-curve), so the acceleration value IS the smoothness: lower = softer starts and stops.
+    #   1500 nails/min = 25 nails/s = 5.2 platter rpm (21 rpm at the motor)
+    #   25 nails/s^2   = 1.0 s to reach full speed over 12.5 nails; rim (R 290) at 0.16 m/s^2
+    #   half turn 6.8 s, average jump 3.9 s, 1-nail sweep 0.4 s, ~6.4 h for 4000 lines
+    #   Motor needs ~0.04 N.m of its 2.4 N.m to do this even with a 7 kg platter: no lost steps.
+    #   Check it with platter-test.gcode before raising either number; raise in small steps.
+    max_rate_mm_per_min: 1500   # nails per minute
+    acceleration_mm_per_sec2: 25  # nails per second squared
     max_travel_mm: 100000       # effectively unlimited: X unwraps as the platter turns
     soft_limits: false
     motor0:
