@@ -31,9 +31,12 @@ meta: rotating platter (X, nail units) + radial threader (Y) + drill feed (Z)
 
 stepping:
   engine: I2S_STREAM
-  idle_ms: 255          # 255 = never disable: keeps the platter energised between moves
-  pulse_us: 4           # DM542T needs >= 2.5 us
-  dir_delay_us: 8       # DM542T wants DIR settled >= 5 us before the step edge; margin for the I2S engine
+  # 255 = never disable: keeps the platter energised between moves
+  idle_ms: 255
+  # DM542T needs >= 2.5 us
+  pulse_us: 4
+  # DM542T wants DIR settled >= 5 us before the step edge; margin for the I2S engine
+  dir_delay_us: 8
   disable_delay_us: 0
 
 axes:
@@ -49,7 +52,8 @@ axes:
   #  Signals (common cathode, the PiBot terminal sources 5 V):
   #    STP -> PUL+, DIR -> DIR+, GND -> PUL- and DIR-.  ENA+/ENA- unconnected (always enabled).
   x:
-    steps_per_mm: 44.44444      # steps PER NAIL: 3200 * 4 / 288 (keep the digits: X never wraps)
+    # steps PER NAIL: 3200 * 4 / 288 (keep the digits: X never wraps)
+    steps_per_mm: 44.44444
     # Speed and ramp, in nails (288 per platter turn). Chosen gentle on purpose: the platter is
     # heavy and accuracy matters more than run time. FluidNC ramps at constant acceleration
     # (no S-curve), so the acceleration value IS the smoothness: lower = softer starts and stops.
@@ -58,9 +62,12 @@ axes:
     #   half turn 6.8 s, average jump 3.9 s, 1-nail sweep 0.4 s, ~6.4 h for 4000 lines
     #   Motor needs ~0.04 N.m of its 2.4 N.m to do this even with a 7 kg platter: no lost steps.
     #   Check it with platter-test.gcode before raising either number; raise in small steps.
-    max_rate_mm_per_min: 1500   # nails per minute
-    acceleration_mm_per_sec2: 25  # nails per second squared
-    max_travel_mm: 100000       # effectively unlimited: X unwraps as the platter turns
+    # nails per minute
+    max_rate_mm_per_min: 1500
+    # nails per second squared
+    acceleration_mm_per_sec2: 25
+    # effectively unlimited: X unwraps as the platter turns
+    max_travel_mm: 100000
     soft_limits: false
     homing:
       cycle: 2
@@ -72,13 +79,17 @@ axes:
       seek_scaler: 1.1
       feed_scaler: 1.1
     motor0:
-      limit_neg_pin: gpio.33     # X limit (JST-XH io33): index switch at nail 0, wired NC (no :low)
+      # X limit (JST-XH io33): index switch at nail 0, wired NC (no :low)
+      limit_neg_pin: gpio.33
       hard_limits: false
-      pulloff_mm: 0.4            # nail units: X=0 sits 0.4 nail past the switch trip point
+      # nail units: X=0 sits 0.4 nail past the switch trip point
+      pulloff_mm: 0.4
       standard_stepper:
         step_pin: I2SO.2
-        direction_pin: I2SO.1    # wrong way round? use I2SO.1:low
-        disable_pin: I2SO.0      # not wired to the DM542T; drives the slot's EN LED only
+        # wrong way round? use I2SO.1:low
+        direction_pin: I2SO.1
+        # not wired to the DM542T; drives the slot's EN LED only
+        disable_pin: I2SO.0
 
   # ---- Threader: 17HE08-1004S pancake on a TMC2209 in socket 2, standalone step/dir.
   #  Vref 0.9-1.0 V (~0.65-0.7 A RMS), needs 24 V on Vmot-Driver to read. MS1+MS2 jumpers on the
@@ -86,14 +97,16 @@ axes:
   #  standalone mode with automatic current reduction at standstill.
   #  Coils on the 17HE08-1004S: black/blue and green/red, each on two neighbouring terminal screws.
   y:
-    steps_per_mm: 80            # GT2 20T pulley (40 mm/rev) at 16 microsteps: 3200 / 40
+    # GT2 20T pulley (40 mm/rev) at 16 microsteps: 3200 / 40
+    steps_per_mm: 80
     max_rate_mm_per_min: 4000
     acceleration_mm_per_sec2: 300
     max_travel_mm: 42
     soft_limits: true
     homing:
       cycle: 1
-      positive_direction: false  # home toward the OUTSIDE end, away from the nails
+      # home toward the OUTSIDE end, away from the nails
+      positive_direction: false
       mpos_mm: 0
       feed_mm_per_min: 200
       seek_mm_per_min: 1000
@@ -101,7 +114,8 @@ axes:
       seek_scaler: 1.1
       feed_scaler: 1.1
     motor0:
-      limit_neg_pin: gpio.32     # Y limit (JST-XH io32), wired NC. Normally-open module? add :low
+      # Y limit (JST-XH io32), wired NC. Normally-open module? add :low
+      limit_neg_pin: gpio.32
       hard_limits: false
       pulloff_mm: 1.0
       stepstick:
@@ -113,7 +127,8 @@ axes:
   #  machine Z runs 0 down to -max_travel; post.py --drill sets work Z0 at the board surface.
   #  400 steps/mm assumes an 8 mm lead (T8x8). A T8x2 screw needs 1600.
   z:
-    steps_per_mm: 400           # 8 mm lead at 16 microsteps: 3200 / 8
+    # 8 mm lead at 16 microsteps: 3200 / 8
+    steps_per_mm: 400
     max_rate_mm_per_min: 1500
     acceleration_mm_per_sec2: 100
     max_travel_mm: 30
@@ -128,7 +143,8 @@ axes:
       seek_scaler: 1.1
       feed_scaler: 1.1
     motor0:
-      limit_pos_pin: gpio.35     # Z limit (JST-XH io35), wired NC. Normally-open module? add :low
+      # Z limit (JST-XH io35), wired NC. Normally-open module? add :low
+      limit_pos_pin: gpio.35
       hard_limits: false
       pulloff_mm: 1.0
       stepstick:
@@ -140,7 +156,8 @@ i2so:
   bck_pin: gpio.22
   data_pin: gpio.21
   ws_pin: gpio.17
-  min_pulse_us: 4       # 4 us I2S frames: longer DIR-before-STEP lead for the DM542T
+  # 4 us I2S frames: longer DIR-before-STEP lead for the DM542T
+  min_pulse_us: 4
 
 spi:
   miso_pin: gpio.19
