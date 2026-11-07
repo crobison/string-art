@@ -237,7 +237,7 @@ footer { margin-top: 72px; padding-top: 20px; border-top: 1px solid var(--line);
     </div>
     <div class="call do"><h4>Upload our configs</h4><ol>
       <li>From the repo, copy <code>machine/fluidnc-bench.yaml</code> as <code>bench.yaml</code> and <code>machine/fluidnc-config.yaml</code> as <code>stringart.yaml</code>.</li>
-      <li>In the WebUI, open the file browser for the board's flash (not the SD card) and upload both. Leave the factory <code>config.yaml</code> there as a fallback.</li>
+      <li>Upload both to the board's <b>flash</b>, not the SD card: FluidNC only reads its config from flash. The Files panel on the WebUI dashboard shows only the SD card. The flash is under the <b>FluidNC</b> tab at the top of the WebUI: press <b>Manage local files</b> and upload there. Leave the factory <code>config.yaml</code> there as a fallback.</li>
       <li>In the WebUI console, send these one line at a time:</li>
     </ol>
 <pre class="cmd">$Config/Filename=bench.yaml
