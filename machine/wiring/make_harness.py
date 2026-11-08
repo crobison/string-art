@@ -70,7 +70,7 @@ CONNECTORS = {
                      pins=[("2B", "U3.2B"), ("2A", "U3.2A"), ("1A", "U3.1A"), ("1B", "U3.1B")],
                      notes="No pin labels on the board. Pins 1-4 are 2B, 2A, 1A, 1B:\n"
                            "one coil on the two screws at each end."),
-    "NEMA17_Y": dict(type="NEMA17 17HE08-1004S pancake", subtype="threader motor (Y)",
+    "NEMA17_Y": dict(type="NEMA17 17HE08-1004S (small, thin)", subtype="threader motor (Y)",
                      pins=[("A+", "M2.A+/blk"), ("A-", "M2.A-/blu"), ("B+", "M2.B+/grn"),
                            ("B-", "M2.B-/red")], colors=["BK", "BU", "GN", "RD"],
                      notes="Coils: black-blue and green-red, about 3.6 ohm each."),
@@ -78,7 +78,7 @@ CONNECTORS = {
                      pins=[("2B", "U4.2B"), ("2A", "U4.2A"), ("1A", "U4.1A"), ("1B", "U4.1B")],
                      notes="No pin labels on the board. Pins 1-4 are 2B, 2A, 1A, 1B:\n"
                            "one coil on the two screws at each end."),
-    "NEMA17_Z": dict(type="NEMA17 17HE08-1004S pancake", subtype="drill feed motor (Z)",
+    "NEMA17_Z": dict(type="NEMA17 17HE08-1004S (small, thin)", subtype="drill feed motor (Z)",
                      pins=[("A+", "M3.A+/blk"), ("A-", "M3.A-/blu"), ("B+", "M3.B+/grn"),
                            ("B-", "M3.B-/red")], colors=["BK", "BU", "GN", "RD"],
                      notes="Coils: black-blue and green-red, about 3.6 ohm each."),

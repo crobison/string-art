@@ -3,8 +3,8 @@
 # Upload as bench.yaml, run  $Config/Filename=bench.yaml  and restart. Switch to stringart.yaml after.
 #   $J=G91 X72 F600   -> exactly one NEMA23 shaft turn (72 x 44.444 = 3200 steps)
 #   Then run platter-test.gcode (speed ladder, ramp and return-to-mark check).
-#   $J=G91 Y40 F600   -> exactly one pancake shaft turn on Y (40 x 80 = 3200 steps)
-#   $J=G91 Z8 F300    -> exactly one pancake shaft turn on Z (8 x 400 = 3200 steps)
+#   $J=G91 Y40 F600   -> exactly one small-NEMA17 shaft turn on Y (40 x 80 = 3200 steps)
+#   $J=G91 Z8 F300    -> exactly one small-NEMA17 shaft turn on Z (8 x 400 = 3200 steps)
 # One turn per command proves the microstep setting as well as the wiring.
 
 board: PiBot V4.96 Pro
@@ -62,7 +62,7 @@ axes:
         # not wired to the DM542T; drives the slot's EN LED only
         disable_pin: I2SO.0
 
-  # ---- Threader: 17HE08-1004S pancake on a TMC2209 in socket 2, standalone step/dir.
+  # ---- Threader: 17HE08-1004S small NEMA17 on a TMC2209 in socket 2, standalone step/dir.
   #  Vref 0.9-1.0 V (~0.65-0.7 A RMS), needs 24 V on Vmot-Driver to read. MS1+MS2 jumpers on the
   #  VDD side = 1/16.  No ms3_pin: that socket position is PDN_UART (I2SO.6 / I2SO.11); low keeps
   #  standalone mode with automatic current reduction at standstill.

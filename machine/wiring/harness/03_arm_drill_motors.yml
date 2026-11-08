@@ -20,7 +20,7 @@ connectors:
 
       one coil on the two screws at each end.'
   NEMA17_Y:
-    type: NEMA17 17HE08-1004S pancake
+    type: NEMA17 17HE08-1004S (small, thin)
     subtype: threader motor (Y)
     pinlabels:
     - A+
@@ -49,7 +49,7 @@ connectors:
 
       one coil on the two screws at each end.'
   NEMA17_Z:
-    type: NEMA17 17HE08-1004S pancake
+    type: NEMA17 17HE08-1004S (small, thin)
     subtype: drill feed motor (Z)
     pinlabels:
     - A+

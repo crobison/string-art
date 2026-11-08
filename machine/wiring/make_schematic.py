@@ -139,7 +139,7 @@ NOTES = """NOTES
 7. Endstops COM to GND, NC to Signal: closed at rest, opens when hit or if a wire breaks;
    config pins have no :low. Input LEDs are lit at rest and go out when a switch is pressed.
 8. Relay CN1: pin 1 COM, pin 2 NC (unused), pin 3 NO. D1 across the drill, stripe to +.
-9. Pancake 17HE08-1004S coils: black/blue = A, green/red = B. NEMA23: black/green, red/blue."""
+9. Small NEMA17 17HE08-1004S coils: black/blue = A, green/red = B. NEMA23: black/green, red/blue."""
 
 
 def sides(b):

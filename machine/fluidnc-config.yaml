@@ -91,7 +91,7 @@ axes:
         # not wired to the DM542T; drives the slot's EN LED only
         disable_pin: I2SO.0
 
-  # ---- Threader: 17HE08-1004S pancake on a TMC2209 in socket 2, standalone step/dir.
+  # ---- Threader: 17HE08-1004S small NEMA17 on a TMC2209 in socket 2, standalone step/dir.
   #  Vref 0.9-1.0 V (~0.65-0.7 A RMS), needs 24 V on Vmot-Driver to read. MS1+MS2 jumpers on the
   #  VDD side = 1/16.  No ms3_pin: that socket position is PDN_UART (I2SO.6 / I2SO.11); low keeps
   #  standalone mode with automatic current reduction at standstill.
