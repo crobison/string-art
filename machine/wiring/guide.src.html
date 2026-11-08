@@ -263,8 +263,12 @@ $CD                        (prints the config it actually loaded)</pre>
         exactly once, so it checks the microstep setting as well as the wiring. Uses <code>bench.yaml</code>, which has no homing, so you can jog straight away.</p></div></div>
     <div class="callouts">
       <div class="call do"><h4>Test 0: signal LEDs, no motor</h4><ol>
-        <li>Board on Vmot only, <code>bench.yaml</code> active. The EN LEDs of slots 1–3 are <b>off</b>: the config keeps the drivers enabled, and a lit EN LED means that driver is disabled.</li>
-        <li>Send <code>$J=G91 X10 F300</code>, then <code>$J=G91 Y10 F600</code>. Slot 1's and then slot 2's STEP and DIR LEDs flicker while the axis "moves". This is PiBot's test 2.8.</li>
+        <li>Power goes only to the orange <b>Vmot</b> connector on the right edge of the board (CN3). Leave the Vmot-Driver screw terminal unconnected, the driver sockets empty and every motor unplugged.</li>
+        <li>Check that the board is running <code>bench.yaml</code>: send <code>$SS</code>. The log should show <code>Configuration file:bench.yaml</code> and no <code>[MSG:ERR:</code> line. If it names a different file, send <code>$Config/Filename=bench.yaml</code>, then <code>$Bye</code>.</li>
+        <li>Find the signal LEDs: each slot has a column of three small LEDs just right of its socket, labelled by the I2S output that drives them, not by name. Slot 1: <b>I2.0</b> = EN, <b>I2.2</b> = STEP, <b>I2.1</b> = DIR. Slot 2: I2.7 = EN, I2.5 = STEP, I2.4 = DIR. Slot 3: I2.8 = EN, I2.10 = STEP, I2.9 = DIR.</li>
+        <li>The EN LEDs (I2.0, I2.7, I2.8) should be <b>off</b>. A lit EN LED means that driver is switched off; off means the config is holding it on.</li>
+        <li>Send <code>$J=G91 X10 F300</code>, then <code>$J=G91 X-10 F300</code>. Slot 1's DIR LED (I2.1) changes state between the two: on for one direction, off for the other. The STEP LED (I2.2) may glow faintly or not visibly at all: the pulses are only 4 µs long. The DIR LED is the reliable check.</li>
+        <li>Repeat with <code>$J=G91 Y10 F600</code> and <code>$J=G91 Y-10 F600</code>: slot 2's DIR LED (I2.4) changes state. This is PiBot's test 2.8.</li>
       </ol></div>
       <div class="call do"><h4>Test 1: threader pancake on a TMC2209</h4><ol>
         <li>Brick unplugged. Add step 1's Vmot-Driver pair. TMC2209 in socket 2, EN pin to the EN mark.</li>
@@ -289,7 +293,7 @@ $CD                        (prints the config it actually loaded)</pre>
         <tr><td>NEMA23 turns twice</td><td>DM542T at 1600 (SW5–8 = OFF OFF ON ON)</td><td>SW5–8 = ON ON OFF ON</td></tr>
         <tr><td>Motor buzzes or jitters but doesn't turn</td><td>The two wires of one coil are split across the two coil pairs</td><td>Power off. Find the pairs with the meter (pancake about 3.6 Ω, NEMA23 about 1 Ω between the two wires of a coil) and put each coil on its own pair of screws</td></tr>
         <tr><td>Silent, shaft turns freely by hand</td><td>No motor power, driver disabled, or no signal reaching it</td><td>TMC2209: is 24 V on Vmot-Driver? Is Vref above 0? DM542T: is the green LED on, and is the 5V/24V selector on 5V?</td></tr>
-        <tr><td>Silent, but slot LEDs don't flicker</td><td>Config problem, or the controller is in alarm</td><td>Send <code>$X</code>, then check <code>$SS</code> for <code>[MSG:ERR:</code> lines</td></tr>
+        <tr><td>Silent, and the slot's DIR LED doesn't change between + and − jogs</td><td>Config problem, or the controller is in alarm</td><td>Send <code>$X</code>, then check <code>$SS</code> for <code>[MSG:ERR:</code> lines</td></tr>
         <tr><td>DM542T red LED blinks</td><td>1 blink: over-current or a short in the motor wiring. 2 blinks: over-voltage</td><td>Power off and check the motor leads and the brick's voltage</td></tr>
         <tr><td>Turns the wrong way</td><td>Normal: direction is arbitrary until set</td><td>Fix it later, after assembly: add <code>:low</code> to that axis's <code>direction_pin</code></td></tr>
       </tbody>
